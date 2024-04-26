@@ -1,4 +1,4 @@
-# Sistema de Gerenciamento do Plano de Desenvolvimento Institucional (PDI)
+# Sistema de Apoio ao Plano de Desenvolvimento Institucional (SAPDI)
 
 Este sistema foi desenvolvido em equipe conforme demanda para simular possíveis cenários de desenvolvimento institucional e quais seriam os seus impactos no câmpus do IFSP - Presidente Epitácio.
 
