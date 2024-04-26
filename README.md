@@ -8,6 +8,10 @@ O código fonte do sistema pode ser acessado no diretório `Codigo_Fonte`.
 
 Dentro do diretório `Scripts` está contido alguns scripts de inserções em banco de dados, além de scripts que foram realizados para automatizar alguns processos manuais da equipe.
 
+O sistema permanece em produção para futuras manutenções, link de acesso:
+
+`http://pep2.ifsp.edu.br/sapdi/`
+
 ## Stack
 
 **Tecnologias:** Java, JDK 11, JSF 2.3, Primefaces 12.0, MySQL, Payara Server, Glassfish Server e Docker.
