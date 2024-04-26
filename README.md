@@ -23,12 +23,12 @@ Dentro do diretório `Scripts` está contido alguns scripts de inserções em ba
 
 ### **Página de Login**
 
-<img src="to_github/login_page.png">
+<img src="To_github/login_page.png">
 
 ### **Página de Home do Usuário (1)**
 
-<img src="to_github/home_page.png">
+<img src="To_github/home_page.png">
 
 ### **Página de Home do Usuário (2)**
 
-<img src="to_github/home_page_2.png">
+<img src="To_github/home_page_2.png">
