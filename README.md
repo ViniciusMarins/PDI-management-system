@@ -1,6 +1,6 @@
 # Sistema de Gerenciamento do Plano de Desenvolvimento Institucional (PDI)
 
-Este sistema foi desenvolvido em equipe conforme demanda para simular possíveis cenários de desenvolvimento institucional e quais seriam os seus impactos no campus do IFSP - Presidente Epitácio.
+Este sistema foi desenvolvido em equipe conforme demanda para simular possíveis cenários de desenvolvimento institucional e quais seriam os seus impactos no câmpus do IFSP - Presidente Epitácio.
 
 É possível conferir toda a documentação do sistema no diretório `Documentação`.
 
