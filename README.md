@@ -6,7 +6,7 @@ Este sistema foi desenvolvido em equipe conforme demanda para simular possíveis
 
 O código fonte do sistema pode ser acessado no diretório `Codigo_Fonte`.
 
-Dentro do diretório `Scripts` está contido alguns scripts de inserções em banco de dados, além de scripts que foram realizados para automatizar alguns processos manuais da equipe.
+Dentro do diretório `Script` está contido alguns scripts de inserções em banco de dados, além de scripts que foram realizados para automatizar alguns processos manuais da equipe.
 
 O sistema permanece em produção para futuras manutenções, link de acesso:
 
