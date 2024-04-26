@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Redefinir senha</title>
+        <link rel="shortcut icon" type="image/x-icon" href="#{resource['img/icon.png']}"/>
+        <h:outputStylesheet name="css/cssLayout.css"/>
+
+        <h:outputStylesheet rendered="#{loginController.tema eq 'arya'}" name="css/global-black.css" />
+        <h:outputStylesheet rendered="#{loginController.tema eq 'saga'}" name="css/global-white.css" />
+        
+        <h:outputStylesheet name="css/pflex.css"/>
+    </h:head>
+    <h:body style="display: flex; flex: 1; align-items: center; justify-content: center; height: 100vh; padding: 16px">
+
+        <p:growl id="messages" showDetail="true" />
+
+        <!--
+        <p:row styleClass="my-heading-row">
+            <p:outputLabel style="font-weight: bold" value="Login"/>
+        </p:row>-->
+        <h:form class="login-container">
+            <h1>         
+                Redefinição de Senha
+            </h1>
+
+            <label for="token" class="col-6" style="padding: 0 !important">
+                Token
+            </label>
+            <p:inputText id="token" value="#{resetController.token}" 
+                         required="true" requiredMessage="Informe um Token"
+                         />
+
+            <label for="novaSenha" class="col-6" style="padding: 0 !important">
+                Nova Senha
+            </label>
+            <p:password id="novaSenha" value="#{resetController.senha}" 
+                        required="true" requiredMessage="Digite a nova senha"
+                        toggleMask="true" redisplay="true">
+            </p:password>
+
+            <label for="confirmaSenha" class="col-6" style="padding: 0 !important">
+                Confirmar Nova Senha
+            </label>
+            <p:password id="confirmaSenha" value="#{resetController.confirmarSenha}" 
+                        required="true" requiredMessage="Confirme a nova senha"
+                        toggleMask="true" redisplay="true" />
+
+            <p:commandButton style="margin-top: 8px" value="Redefinir" action="#{resetController.redefinir()}" update="messages">
+            </p:commandButton>
+        </h:form>
+    </h:body>
+</html>
+

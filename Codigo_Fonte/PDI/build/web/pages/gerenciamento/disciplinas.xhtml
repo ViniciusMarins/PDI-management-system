@@ -1,0 +1,308 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+        <ui:composition template="/pages/home.xhtml">
+            <ui:define name="content">
+                <f:metadata>
+                    <f:viewAction action="#{disciplinaController.fillDisciplinaList()}" />
+                </f:metadata>
+                <div class="card">
+                    <h:form id="form">
+                        <p:growl id="messages" showDetail="true"/>
+
+                        <p:breadCrumb>
+                            <p:menuitem outcome="/pages/home" value="Home"/>
+                            <p:menuitem outcome="/pages/gerenciamento/disciplinas" value="Gerenciamento de Disciplinas"/>
+                        </p:breadCrumb>
+
+                        <p:dataTable id="dt-disciplinas" widgetVar="dtDisciplinas" var="disciplina" value="#{disciplinaController.disciplinas}"
+                                     emptyMessage="Nenhuma disciplina encontrada" rowKey="#{disciplina.idDisciplina}" styleClass="curso-table"
+                                     style="margin-top: 10px" paginator="true" rows="10" paginatorPosition="bottom">
+
+                            <f:facet name="header">
+                                <div class="flex align-items-center justify-content-between">
+                                    <span>Disciplinas</span>
+                                    <div>
+                                        <p:commandButton id="refresh"  action="#{disciplinaController.fillDisciplinaList()}" style="margin-right: 7px"
+                                                         process="@this" update="form:dt-disciplinas" icon="pi pi-replay" styleClass="rounded-button" />
+                                        <p:commandButton value="Cadastrar" icon="pi pi-plus" actionListener="#{disciplinaController.openNew()}"
+                                                         update=":dialogs:create-disciplina-content" oncomplete="PF('createDisciplinaDialog').show()"
+                                                         style="margin-right: .5rem">
+                                            <p:resetInput target=":dialogs:create-disciplina-content"/>
+                                        </p:commandButton>
+
+                                        <p:commandButton id="toggler" type="button" value="Campos" icon="pi pi-align-justify"/>
+                                        <p:columnToggler datasource="dt-disciplinas" trigger="toggler">
+                                            <p:ajax />
+                                        </p:columnToggler>
+
+                                        <p:tooltip for="refresh" value="Recarregar Tabela" position="top"/>
+                                        <p:tooltip for="toggler" value="Campos da Tabela" position="top"/>
+                                    </div>
+                                </div>
+                            </f:facet>
+
+                            <p:column headerText="Sigla" sortBy="#{disciplina.sigla}" filterBy="#{disciplina.sigla}" filterMatchMode="contains">
+                                <h:outputText value="#{disciplina.sigla}" />
+                            </p:column>
+
+                            <p:column headerText="Nome" sortBy="#{disciplina.nome}" filterBy="#{disciplina.nome}" filterMatchMode="contains">
+                                <h:outputText value="#{disciplina.nome}"  />
+                            </p:column>
+
+                            <p:column headerText="Curso" sortBy="#{disciplina.idCurso.sigla}" filterBy="#{disciplina.idCurso.sigla}" filterMatchMode="contains">
+                                <h:outputText value="#{disciplina.idCurso.sigla}"  />
+                            </p:column>
+
+                            <p:column headerText="Semestre" sortBy="#{disciplina.semestre}" filterBy="#{disciplina.semestre}" filterMatchMode="contains">
+                                <h:outputText value="#{disciplina.semestre}"  />
+                            </p:column>
+
+                            <p:column headerText="Regência" sortBy="#{disciplina.regencia}" filterBy="#{disciplina.regencia}" filterMatchMode="contains">
+                                <h:outputText value="#{disciplina.regencia}"  />
+                            </p:column>
+
+                            <p:column headerText="Carga Horária" sortBy="#{disciplina.cargaHoraria}" filterBy="#{disciplina.cargaHoraria}" filterMatchMode="contains">
+                                <h:outputText value="#{disciplina.cargaHoraria}"  />
+                            </p:column>
+
+                            <p:column headerText="Área de Docente 1" sortBy="#{disciplina.idArea.descricao}" filterBy="#{disciplina.idArea.descricao}" filterMatchMode="contains">
+                                <h:outputText value="#{disciplina.idArea.descricao}" />
+                            </p:column>
+
+
+                            <p:column headerText="Status" sortBy="#{disciplina.status}" filterBy="#{disciplina.status}" filterMatchMode="contains">
+                                <p:selectBooleanCheckbox value="#{disciplina.status}">
+                                    <p:ajax event="change" listener="#{disciplinaController.alterarDisciplina(disciplina)}" update="form:dt-disciplinas" />
+                                </p:selectBooleanCheckbox>
+                            </p:column>
+
+
+
+                            <p:column headerText="Ações" exportable="false">
+                                <p:commandButton id="editar" icon="pi pi-pencil" update=":dialogs:edit-disciplina-content"
+                                                 oncomplete="PF('editDisciplinaDialog').show()"
+                                                 styleClass="edit-button rounded-button" process="@this">
+                                    <f:setPropertyActionListener value="#{disciplina}" target="#{disciplinaController.disciplina}"/>
+                                    <p:resetInput target=":dialogs:edit-disciplina-content"/>
+                                </p:commandButton>
+                                <p:tooltip for="editar" value="Editar Disciplina" position="left"/>
+
+                                <p:commandButton id="deletar" icon="pi pi-trash" style="margin-left: 7px;"
+                                                 oncomplete="PF('deleteDisciplinaDialog').show()" 
+                                                 styleClass="ui-button-danger rounded-button" process="@this"
+                                                 update="dialogs">
+                                    <f:setPropertyActionListener value="#{disciplina}" target="#{disciplinaController.disciplina}"/>
+                                </p:commandButton>
+                                <p:tooltip for="deletar" value="Deletar Disciplina" position="left"/>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+
+                    <h:form id="dialogs">
+                        <p:growl id="msg" showDetail="true"/>
+                        <p:dialog header="Cadastrar Disciplina" showEffect="fade" modal="true"
+                                  minimizable="true" maximizable="true" closeOnEscape="true"
+                                  widgetVar="createDisciplinaDialog" responsive="true" fitViewport="true">
+                            <p:outputPanel id="create-disciplina-content" class="ui-fluid">
+                                <p:outputPanel rendered="#{not empty disciplinaController.disciplina}">
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="sigla_create">Sigla</p:outputLabel>
+                                        <p:inputText id="sigla_create" value="#{disciplinaController.disciplina.sigla}" required="true" requiredMessage="Sigla da disciplina é obrigatório."/>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="nome_create">Nome</p:outputLabel>
+                                        <p:inputText id="nome_create" value="#{disciplinaController.disciplina.nome}" required="true" requiredMessage="Nome da disciplina é obrigatório."/>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="curso_create">Curso</p:outputLabel>
+                                        <p:selectOneMenu id="curso_create" value="#{disciplinaController.disciplina.idCurso}"
+                                                         required="true" requiredMessage="Selecione um Curso" converter="#{cursoSigla}">
+                                            <f:selectItem itemLabel="Selecione o Curso" itemValue=""/>
+                                            <f:selectItems value="#{cursoController.cursos}" var="cursoId"
+                                                           itemLabel="#{cursoId.descricao}" itemValue="#{cursoId}"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="area_create">Área de Docente 1</p:outputLabel>
+                                        <p:selectOneMenu id="area_create" value="#{disciplinaController.disciplina.idArea}"
+                                                         required="true" requiredMessage="Selecione uma área de concurso" converter="#{areaId}">
+                                            <f:selectItem itemLabel="Selecione área de concurso" itemValue=""/>
+                                            <f:selectItems value="#{areaController.areas}" var="areaId"
+                                                           itemLabel="#{areaId.descricao}" itemValue="#{areaId}"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="area2_create">Área de Docente 2</p:outputLabel>
+                                        <p:selectOneMenu id="area2_create" value="#{disciplinaController.disciplina.idArea2}"
+                                                         required="false" requiredMessage="Selecione uma área de concurso" converter="#{areaId}">
+                                            <f:selectItem itemLabel="Selecione área de concurso" itemValue=""/>
+                                            <f:selectItems value="#{areaController.areas}" var="areaId"
+                                                           itemLabel="#{areaId.descricao}" itemValue="#{areaId}"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="semestre_create">Semestre</p:outputLabel>
+                                        <p:selectOneMenu id="semestre_create" value="#{disciplinaController.disciplina.semestre}" required="true" requiredMessage="Semestre é obrigatório.">
+                                            <f:selectItem itemLabel="Selecione um Tipo" itemValue=""/>
+                                            <f:selectItem itemLabel="PAR" itemValue="PAR"/>
+                                            <f:selectItem itemLabel="ÍMPAR" itemValue="IMPAR"/>
+                                            <f:selectItem itemLabel="AMBOS" itemValue="AMBOS"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="regencia_create">Regência</p:outputLabel>
+                                        <p:selectOneMenu id="regencia_create" value="#{disciplinaController.disciplina.regencia}" required="false">
+                                            <p:ajax update="labelCargaHorariaParcial, cargaHorariaParcial_create" />
+                                            <f:selectItem itemLabel="Sem regência especial" itemValue="SEM REGÊNCIA"/>
+                                            <f:selectItem itemLabel="INTEGRAL" itemValue="INTEGRAL"/>
+                                            <f:selectItem itemLabel="PARCIAL" itemValue="PARCIAL" />
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="cargaHoraria_create">Carga Horária (Semanal)</p:outputLabel>
+                                        <p:inputNumber minValue="2" id="cargaHoraria_create" value="#{disciplinaController.disciplina.cargaHoraria}" required="true" requiredMessage="Carga horária da disciplina é obrigatório."/>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel  for="cargaHorariaParcial_create" id="labelCargaHorariaParcial">Carga Horária Parcial</p:outputLabel>
+                                        <p:inputNumber disabled="#{disciplinaController.disciplina.regencia ne 'PARCIAL'}" 
+                                                       id="cargaHorariaParcial_create" value="#{disciplinaController.disciplina.cargaHorariaParcial}" />
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:selectBooleanCheckbox id="status_create" value="#{disciplinaController.disciplina.status}" itemLabel="Ativado na simulação"/>
+                                    </div>
+
+                                </p:outputPanel>
+                            </p:outputPanel>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Cadastrar" icon="pi pi-check" actionListener="#{disciplinaController.cadastrarDisciplina()}"
+                                                 update="create-disciplina-content msg" process="create-disciplina-content @this"/>
+                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('createDisciplinaDialog').hide()"
+                                                 class="ui-button-secondary"/>
+                            </f:facet>
+                        </p:dialog>
+
+                        <p:dialog header="Editar Disciplina" showEffect="fade" modal="true"
+                                  minimizable="true" maximizable="true" closeOnEscape="true"
+                                  widgetVar="editDisciplinaDialog" responsive="true" fitViewport="true">
+                            <p:outputPanel id="edit-disciplina-content" class="ui-fluid">
+                                <p:outputPanel rendered="#{not empty disciplinaController.disciplina}">
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="sigla_edit">Sigla</p:outputLabel>
+                                        <p:inputText id="sigla_edit" value="#{disciplinaController.disciplina.sigla}" required="true" requiredMessage="Sigla da disciplina é obrigatório."/>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="nome_edit">Nome</p:outputLabel>
+                                        <p:inputText id="nome_edit" value="#{disciplinaController.disciplina.nome}" required="true" requiredMessage="Nome da disciplina é obrigatório."/>
+                                    </div>
+                                    <div class="p-field">
+                                        <p:outputLabel for="curso_edit">Curso</p:outputLabel>
+                                        <p:selectOneMenu id="curso_edit" value="#{disciplinaController.disciplina.idCurso}"
+                                                         required="true" requiredMessage="Selecione um Curso" converter="#{cursoId}">
+                                            <f:selectItem itemLabel="Selecione o Curso" itemValue=""/>
+                                            <f:selectItems value="#{cursoController.cursos}" var="cursoId"
+                                                           itemLabel="#{cursoId.descricao}" itemValue="#{cursoId}"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="area_edit">Área de Docente 1</p:outputLabel>
+                                        <p:selectOneMenu id="area_edit" value="#{disciplinaController.disciplina.idArea}"
+                                                         required="true" requiredMessage="Selecione uma área de concurso" converter="#{areaId}">
+                                            <f:selectItem itemLabel="Selecione área de concurso" itemValue=""/>
+                                            <f:selectItems value="#{areaController.areas}" var="areaId"
+                                                           itemLabel="#{areaId.descricao}" itemValue="#{areaId}"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="area2_edit">Área de Docente 2</p:outputLabel>
+                                        <p:selectOneMenu id="area2_edit" value="#{disciplinaController.disciplina.idArea2}"
+                                                         required="false" requiredMessage="Selecione uma área de concurso" converter="#{areaId}">
+                                            <f:selectItem itemLabel="Selecione área de concurso" itemValue=""/>
+                                            <f:selectItems value="#{areaController.areas}" var="areaId"
+                                                           itemLabel="#{areaId.descricao}" itemValue="#{areaId}"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="semestre_edit">Semestre</p:outputLabel>
+                                        <p:selectOneMenu id="semestre_edit" value="#{disciplinaController.disciplina.semestre}" required="true" requiredMessage="Semestre é obrigatório.">
+                                            <f:selectItem itemLabel="Selecione um Tipo" itemValue=""/>
+                                            <f:selectItem itemLabel="PAR" itemValue="PAR"/>
+                                            <f:selectItem itemLabel="ÍMPAR" itemValue="IMPAR" />
+                                            <f:selectItem itemLabel="AMBOS" itemValue="AMBOS"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="regencia_edit">Regência</p:outputLabel>
+                                        <p:selectOneMenu id="regencia_edit" value="#{disciplinaController.disciplina.regencia}" required="false">
+                                            <p:ajax listener="#{disciplinaController.visualizarRegencia('EDIT')}" update="labelCargaHorariaParcial_edit, cargaHorariaParcial_edit" />
+                                            <f:selectItem itemLabel="Sem regência especial" itemValue="SEM REGÊNCIA"/>
+                                            <f:selectItem itemLabel="INTEGRAL" itemValue="INTEGRAL"/>
+                                            <f:selectItem itemLabel="PARCIAL" itemValue="PARCIAL" />
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="cargaHoraria_edit">Carga Horária</p:outputLabel>
+                                        <p:inputNumber id="cargaHoraria_edit" value="#{disciplinaController.disciplina.cargaHoraria}" required="true" requiredMessage="Carga horária da disciplina é obrigatório."/>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel  for="cargaHorariaParcial_edit" id="labelCargaHorariaParcial_edit">Carga Horária Parcial</p:outputLabel>
+                                        <p:inputNumber disabled="#{disciplinaController.disciplina.regencia ne 'PARCIAL'}" id="cargaHorariaParcial_edit" value="#{disciplinaController.disciplina.cargaHorariaParcial}" />
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:selectBooleanCheckbox id="status_edit" value="#{disciplinaController.disciplina.status}" itemLabel="Ativado na simulação"/>
+                                    </div>
+
+                                </p:outputPanel>
+                            </p:outputPanel>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Editar" icon="pi pi-check" actionListener="#{disciplinaController.editarDisciplina()}"
+                                                 update="edit-disciplina-content msg" process="edit-disciplina-content @this"/>
+                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('editDisciplinaDialog').hide()"
+                                                 class="ui-button-secondary"/>
+                            </f:facet>
+                        </p:dialog>
+
+
+                        <p:confirmDialog widgetVar="deleteDisciplinaDialog" showEffect="fade" width="300"
+                                         message="Deseja remover a disciplina #{disciplinaController.disciplina.nome} ?" header="Confirmação" severity="warn">
+                            <p:commandButton value="Sim" icon="pi pi-check" actionListener="#{disciplinaController.excluirDisciplina()}"
+                                             process="@this" oncomplete="PF('deleteDisciplinaDialog').hide()" update="messages"/>
+                            <p:commandButton value="Não" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                             onclick="PF('deleteDisciplinaDialog').hide()"/>
+                        </p:confirmDialog>
+
+
+                    </h:form>
+                </div>
+
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

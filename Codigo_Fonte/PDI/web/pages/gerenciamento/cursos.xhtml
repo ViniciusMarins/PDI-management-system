@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+        <ui:composition template="/pages/home.xhtml">
+            <ui:define name="content">
+                <f:metadata>
+                    <f:viewAction action="#{cursoController.fillCursoList()}" />
+                </f:metadata>
+                <div class="card">
+                    <h:form id="form">
+                        <p:growl id="messages" showDetail="true"/>
+
+                        <p:breadCrumb>
+                            <p:menuitem outcome="/pages/home" value="Home"/>
+                            <p:menuitem outcome="/pages/gerenciamento/cursos" value="Gerenciamento de Cursos"/>
+                        </p:breadCrumb>
+
+                        <p:dataTable id="dt-cursos" widgetVar="dtCursos" var="curso" value="#{cursoController.cursos}"
+                                     emptyMessage="Nenhum curso encontrado" rowKey="#{curso.idCurso}" styleClass="curso-table"
+                                     style="margin-top: 10px">
+
+                            <f:facet name="header">
+                                <div class="flex align-items-center justify-content-between">
+                                    <span>Cursos</span>
+                                    <div>
+                                        <p:commandButton id="refresh"  action="#{cursoController.fillCursoList()}" style="margin-right: 7px"
+                                                         process="@this" update="form:dt-cursos" icon="pi pi-replay" styleClass="rounded-button" />
+                                        <p:commandButton value="Cadastrar" icon="pi pi-plus" actionListener="#{cursoController.openNew()}"
+                                                         update=":dialogs:create-curso-content" oncomplete="PF('createCursoDialog').show()"
+                                                         style="margin-right: .5rem">
+                                            <p:resetInput target=":dialogs:create-curso-content"/>
+                                        </p:commandButton>
+
+                                        <p:commandButton id="toggler" type="button" value="Campos" icon="pi pi-align-justify"/>
+                                        <p:columnToggler datasource="dt-cursos" trigger="toggler">
+                                            <p:ajax />
+                                        </p:columnToggler>
+
+                                        <p:tooltip for="refresh" value="Recarregar Tabela" position="top"/>
+                                        <p:tooltip for="toggler" value="Campos da Tabela" position="top"/>
+                                    </div>
+                                </div>
+                            </f:facet>
+
+                            <p:column headerText="Sigla" sortBy="#{curso.sigla}" filterBy="#{curso.sigla}" filterMatchMode="contains">
+                                <h:outputText value="#{curso.sigla}" />
+                            </p:column>
+
+                            <p:column headerText="Descrição" sortBy="#{curso.descricao}" filterBy="#{curso.descricao}" filterMatchMode="contains">
+                                <h:outputText value="#{curso.descricao}"  />
+                            </p:column>
+
+                            <p:column headerText="Semestre" sortBy="#{curso.semestre}" filterBy="#{curso.semestre}" filterMatchMode="contains">
+                                <h:outputText value="#{curso.semestre}"  />
+                            </p:column>
+
+                            <p:column headerText="Área de Lotação" sortBy="#{curso.idLotacao.descricao}" filterBy="#{curso.idLotacao.descricao}" filterMatchMode="contains">
+                                <h:outputText value="#{curso.idLotacao.descricao}"  />
+                            </p:column>
+
+                            <p:column headerText="Ativado na simulação" sortBy="#{curso.status}" filterBy="#{curso.status}" filterMatchMode="contains">
+                                <p:selectBooleanCheckbox value="#{curso.status}" >
+                                    <p:ajax event="change" listener="#{cursoController.alterarCurso(curso)}" update="form:dt-cursos" />
+                                </p:selectBooleanCheckbox>
+                            </p:column>
+
+                            <p:column headerText="Ações" exportable="false">
+                                <p:commandButton id="editar" icon="pi pi-pencil" update=":dialogs:edit-curso-content"
+                                                 oncomplete="PF('editCursoDialog').show()"
+                                                 styleClass="edit-button rounded-button" process="@this">
+                                    <f:setPropertyActionListener value="#{curso}" target="#{cursoController.curso}"/>
+                                    <p:resetInput target=":dialogs:edit-curso-content"/>
+                                </p:commandButton>
+                                <p:tooltip for="editar" value="Editar Curso" position="left"/>
+
+                                <p:commandButton id="deletar" icon="pi pi-trash" style="margin-left: 7px;"
+                                                 oncomplete="PF('deleteCursoDialog').show()" 
+                                                 styleClass="ui-button-danger rounded-button" process="@this"
+                                                 update="dialogs">
+                                    <f:setPropertyActionListener value="#{curso}" target="#{cursoController.curso}"/>
+                                </p:commandButton>
+                                <p:tooltip for="deletar" value="Deletar Curso" position="left"/>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+
+                    <h:form id="dialogs">
+                        <p:growl id="msg" showDetail="true"/>
+                        <p:dialog header="Cadastrar Curso" showEffect="fade" modal="true"
+                                  minimizable="true" maximizable="true" closeOnEscape="true"
+                                  widgetVar="createCursoDialog" responsive="true" fitViewport="true">
+                            <p:outputPanel id="create-curso-content" class="ui-fluid">
+                                <p:outputPanel rendered="#{not empty cursoController.curso}">
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="sigla_create">Sigla</p:outputLabel>
+                                        <p:inputText id="sigla_create" value="#{cursoController.curso.sigla}" required="true" requiredMessage="Sigla do curso é obrigatório."/>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="descricao_create">Descrição</p:outputLabel>
+                                        <p:inputText id="descricao_create" value="#{cursoController.curso.descricao}" required="true" requiredMessage="Descrição do curso é obrigatório."/>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="lotacao_create">Área de lotação</p:outputLabel>
+                                        <p:selectOneMenu id="lotacao_create" value="#{cursoController.curso.idLotacao}"
+                                                         required="true" requiredMessage="Selecione uma área de lotação" converter="#{lotacaoId}">
+                                            <f:selectItem itemLabel="Selecione área de lotação" itemValue=""/>
+                                            <f:selectItems value="#{lotacaoController.lotacoes}" var="lotacaoId"
+                                                           itemLabel="#{lotacaoId.descricao}" itemValue="#{lotacaoId}"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="tipo_create">Semestre</p:outputLabel>
+                                        <p:selectOneMenu id="tipo_create" value="#{cursoController.curso.semestre}" required="true" requiredMessage="Semestre é obrigatório.">
+                                            <f:selectItem itemLabel="Selecione um Tipo" itemValue=""/>
+                                            <f:selectItem itemLabel="PAR" itemValue="PAR"/>
+                                            <f:selectItem itemLabel="ÍMPAR" itemValue="IMPAR"/>
+                                            <f:selectItem itemLabel="AMBOS" itemValue="AMBOS"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:selectBooleanCheckbox id="status_create" value="#{cursoController.curso.status}" itemLabel="  Ativado na simulação"/>
+                                    </div>
+
+                                </p:outputPanel>
+                            </p:outputPanel>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Cadastrar" icon="pi pi-check" actionListener="#{cursoController.cadastrarCurso()}"
+                                                 update="create-curso-content msg" process="create-curso-content @this"/>
+                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('createCursoDialog').hide()"
+                                                 class="ui-button-secondary"/>
+                            </f:facet>
+                        </p:dialog>
+
+                        <p:dialog header="Editar Curso" showEffect="fade" modal="true"
+                                  minimizable="true" maximizable="true" closeOnEscape="true"
+                                  widgetVar="editCursoDialog" responsive="true" fitViewport="true">
+                            <p:outputPanel id="edit-curso-content" class="ui-fluid">
+                                <p:outputPanel rendered="#{not empty cursoController.curso}">
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="sigla_edit">Sigla</p:outputLabel>
+                                        <p:inputText id="sigla_edit" value="#{cursoController.curso.sigla}" required="true" requiredMessage="Sigla do curso é obrigatório."/>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="descricao_edit">Descrição</p:outputLabel>
+                                        <p:inputText id="descricao_edit" value="#{cursoController.curso.descricao}" required="true" requiredMessage="Descrição do curso é obrigatório."/>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="lotacao_edit">Área de lotação</p:outputLabel>
+                                        <p:selectOneMenu id="lotacao_edit" value="#{cursoController.curso.idLotacao}"
+                                                         required="true" requiredMessage="Selecione uma área de lotação" converter="#{lotacaoId}">
+                                            <f:selectItem itemLabel="Selecione área de lotação" itemValue=""/>
+                                            <f:selectItems value="#{lotacaoController.lotacoes}" var="lotacaoId"
+                                                           itemLabel="#{lotacaoId.descricao}" itemValue="#{lotacaoId}"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="tipo_edit">Semestre</p:outputLabel>
+                                        <p:selectOneMenu id="tipo_edit" value="#{cursoController.curso.semestre}" required="true" requiredMessage="Semestre é obrigatório.">
+                                            <f:selectItem itemLabel="Selecione um Tipo" itemValue=""/>
+                                            <f:selectItem itemLabel="PAR" itemValue="PAR"/>
+                                            <f:selectItem itemLabel="ÍMPAR" itemValue="IMPAR"/>
+                                            <f:selectItem itemLabel="AMBOS" itemValue="AMBOS"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:selectBooleanCheckbox id="status_edit" value="#{cursoController.curso.status}" itemLabel="  Ativado na simulação"/>
+                                    </div>
+
+                                </p:outputPanel>
+                            </p:outputPanel>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Editar" icon="pi pi-check" actionListener="#{cursoController.editarCurso()}"
+                                                 update="edit-curso-content msg" process="edit-curso-content @this"/>
+                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('editCursoDialog').hide()"
+                                                 class="ui-button-secondary"/>
+                            </f:facet>
+                        </p:dialog>
+
+
+                        <p:confirmDialog widgetVar="deleteCursoDialog" showEffect="fade" width="300"
+                                         message="Deseja remover o curso #{cursoController.curso.descricao} ?" header="Confirmação" severity="warn">
+                            <p:commandButton value="Sim" icon="pi pi-check" actionListener="#{cursoController.removerCurso()}"
+                                             process="@this" oncomplete="PF('deleteCursoDialog').hide()" update="messages"/>
+                            <p:commandButton value="Não" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                             onclick="PF('deleteCursoDialog').hide()"/>
+                        </p:confirmDialog>
+
+
+                    </h:form>
+                </div>
+
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

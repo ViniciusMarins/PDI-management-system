@@ -1,0 +1,329 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+    <h:head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+        <title>Cadastro de Reunião</title>
+
+        <h:outputStylesheet name="css/pflex.css"/>
+
+
+    </h:head>
+
+    <script>
+        PrimeFaces.locales['pt_BR'] = {
+            closeText: 'Fechar',
+            prevText: 'Anterior',
+            nextText: 'Próximo',
+            currentText: 'Começo',
+            monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+            monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+            dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+            dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+            dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'],
+            weekHeader: 'Semana',
+            firstDay: 1,
+            isRTL: false,
+            showMonthAfterYear: false,
+            yearSuffix: '',
+            timeOnlyTitle: 'Só Horas',
+            timeText: 'Tempo',
+            hourText: 'Hora',
+            minuteText: 'Minuto',
+            secondText: 'Segundo',
+            currentText: 'Data Atual',
+            ampm: false,
+            month: 'Mês',
+            week: 'Semana',
+            day: 'Dia',
+            allDayText: 'Todo Dia'
+        };
+    </script>
+
+    <h:body>
+        <ui:composition template="/pages/home.xhtml">
+            <ui:define name="content">
+                <f:metadata>
+                    <f:viewAction action="#{reuniaoController.openNew()}" />
+                    <f:viewAction action="#{reuniaoController.fillReuniaoList()}" />
+                </f:metadata>
+
+                <h:form id="form" enctype="multipart/form-data">
+                    <p:growl id="messages" showDetail="true"/>
+                    
+                    <p:breadCrumb>
+                        <p:menuitem outcome="/pages/home" value="Home"/>
+                        <p:menuitem outcome="/pages/reuniao/cadastrar" value="Cadastrar Reunião"/>
+                    </p:breadCrumb>
+
+                    <f:facet name="title">
+                        <i class="pi pi-fw pi-database"></i> Dados da Reunião
+                    </f:facet>
+
+                    <div id="reuniao-content" class="flex flex-column">
+                        <h2 class="col-12 mb-3 mt-3 title" ><i class="pi pi-comments" style="font-size: 24px;margin-right:8px"></i>Reunião</h2>
+
+                        <div class="flex gap-3">
+                            <div style="max-width:400px; width:100%">
+                                <p:outputLabel for="input_titulo">Título</p:outputLabel>
+                                <p:inputText id="input_titulo" value="#{reuniaoController.reuniao.titulo}"/>
+                            </div>
+
+                            <div style="max-width:400px; width:100%">
+                                <p:outputLabel for="data_inicio">Data de Início</p:outputLabel>
+                                <p:datePicker class="block" id="data_inicio" locale="pt_BR" timeZone="GMT-3" showTime="true" timeInput="true" readonlyInput="true" 
+                                              value="#{reuniaoController.data_inicio}" mindate="#{reuniaoController.minDate}"/>
+                            </div>
+
+                            <div style="max-width:400px; width:100%">
+                                <p:outputLabel for="data_termino">Data de Término</p:outputLabel>
+                                <p:datePicker class="block" id="data_termino" locale="pt_BR" timeZone="GMT-3" showTime="true" timeInput="true" readonlyInput="true" 
+                                              value="#{reuniaoController.data_termino}" mindate="#{reuniaoController.minDate}" />
+                            </div>
+                        </div>
+
+                        <p:outputLabel class="mt-3" for="input_descricao">Descrição</p:outputLabel>
+                        <p:inputTextarea id="input_descricao" rows="7" cols="40"           
+                                         counterTemplate="{0} caracteres restantes."
+                                         counter="display_descricao"
+                                         maxlength="1500" autoResize="true"
+                                         value="#{reuniaoController.reuniao.descricao}" />
+                        <h:outputText id="display_descricao" style="float: right" />
+
+                    </div>
+                    <p:separator style="margin-bottom: 2em; margin-top: 2em"/>
+
+                    <div id="arquivo-content" class="flex flex-column">
+                        <h2 class="col-12 mb-3 title" ><i class="pi pi-file" style="font-size: 24px;margin-right:8px"></i>Arquivos</h2>
+
+                        <div class="flex flex-column">
+                            <div class="flex gap-3">
+                                <div style="max-width:400px; width:100%">
+                                    <p:outputLabel for="input_arquivo_descricao">Descrição</p:outputLabel>
+                                    <p:inputText style="max-width:400px; width:100%" id="input_arquivo_descricao" value="#{reuniaoController.arquivo.descricao}"/>
+                                </div>
+
+                                <p:fileUpload
+                                    label="Escolher"
+                                    style="max-width:400px; width:100% ;padding-top: 23px;"
+                                    id="fileupload-content"
+                                    value="#{reuniaoController.fileUp}" mode="simple" skinSimple="true"
+                                    />
+                            </div>
+
+                            <p:commandButton value="Adicionar Arquivo" action="#{reuniaoController.adicionarArquivo()}" 
+                                             class="mt-3 mb-3" style="max-width: 230px;width:100%" icon="pi pi-plus"
+                                             update="messages, dt-arquivos, input_arquivo_descricao"
+                                             />
+
+                        </div>
+
+                        <p:dataTable id="dt-arquivos" widgetVar="dtArquivos" var="arquivo" value="#{reuniaoController.arquivos}"
+                                     emptyMessage="Nenhum arquivo encontrado" styleClass="arquivos-table" rowKey="#{arquivo.idArquivo}"
+                                     style="margin-top: 10px" paginator="true" rows="10" paginatorPosition="bottom" reflow="true">
+
+                            <f:facet name="header">
+                                <div class="flex align-items-centern justify-content-between">
+                                    <span>Arquivos da Reunião</span>
+                                </div>
+                            </f:facet>
+
+                            <p:column headerText="Descricao" sortBy="#{arquivo.descricao}">
+                                <h:outputText value="#{arquivo.descricao}"/>
+                            </p:column>
+
+                            <p:column headerText="Nome" sortBy="#{arquivo.nomeUpload}">
+                                <h:outputText value="#{arquivo.nomeUpload}" />
+                            </p:column>
+
+                            <p:column headerText="Ações" exportable="false">
+                                <p:commandButton id="deletar" icon="pi pi-trash" style="margin-left: 8px;"
+                                                 oncomplete="PF('deleteArquivoDialog').show()" 
+                                                 styleClass="ui-button-danger rounded-button" process="@this">
+                                    <f:setPropertyActionListener value="#{arquivo}" target="#{reuniaoController.arquivo}"/>
+                                </p:commandButton>
+                                <p:tooltip for="deletar" value="Deletar Arquivo" position="left"/>
+                            </p:column>
+                        </p:dataTable>
+
+                    </div>
+
+                    <p:separator style="margin-bottom: 2em; margin-top: 2em"/>
+                    <div id="comentario-content" class="flex flex-column">
+                        <h2 class="col-12 mb-3 title" > <i class="pi pi-comment" style="font-size: 24px;margin-right:8px"></i>Comentários</h2>
+
+                        <p:selectOneMenu style="max-width: 400px !important;width:100% !important" id="input_servidor" converter="#{servidorConverter}"
+                                         value="#{reuniaoController.comentario.prontuarioServidor}"
+                                         filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="Selecione o Servidor" itemValue=""/>
+                            <f:selectItems noSelectionValue="null" value="#{servidorController.servidores}" var="servidor" 
+                                           itemLabel="#{servidor.nome} (#{servidor.prontuario})" itemValue="#{servidor}"/>
+                        </p:selectOneMenu>
+
+                        <p:outputLabel class="mt-3" for="input_comentario_descricao">Comentário</p:outputLabel>
+                        <p:inputTextarea id="input_comentario_descricao" rows="7" cols="40"
+                                         required="false" 
+                                         value="#{reuniaoController.comentario.descricao}" />
+                        <h:outputText id="display_comentario_descricao" style="float: right" />
+
+                        <p:commandButton class="mt-3 mb-3" style="max-width: 230px;width:100%" icon="pi pi-plus" value="Adicionar Comentário" update="messages, dt-comentarios, input_comentario_descricao, input_servidor" action="#{reuniaoController.adicionarComentario()}"/>
+
+                        <p:dataTable id="dt-comentarios" widgetVar="dtComentarios" var="comentario" value="#{reuniaoController.comentarios}"
+                                     emptyMessage="Nenhum comentário encontrado" rowKey="#{comentario.idComentario}"
+                                     style="margin-top: 10px" paginator="true" rows="10" paginatorPosition="bottom" >
+
+                            <f:facet name="header">
+                                <div class="flex align-items-centern justify-content-between">
+                                    <span>Comentários da Reunião</span>
+                                </div>
+                            </f:facet>
+
+                            <p:column headerText="Autor" sortBy="#{comentario.prontuarioServidor.nome}" filterBy="#{comentario.prontuarioServidor.nome}">
+                                <h:outputText value="#{comentario.prontuarioServidor.nome}" />
+                            </p:column>
+
+                            <p:column headerText="Comentário" sortBy="#{comentario.descricao}">
+                                <h:outputText value="#{comentario.descricao}" />
+                            </p:column>
+
+                            <p:column headerText="Data" sortBy="#{comentario.data}" filterBy="#{comentario.data}" filterMatchMode="contains">
+                                <h:outputText value="#{comentario.data}" >
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" timeZone="GMT-3"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Ações" exportable="false">
+                                <p:commandButton id="deletar" icon="pi pi-trash" style="margin-left: 8px;"
+                                                 oncomplete="PF('deleteComentarioDialog').show()" 
+                                                 styleClass="ui-button-danger rounded-button" process="@this">
+                                    <f:setPropertyActionListener value="#{comentario}" target="#{reuniaoController.comentario}"/>
+                                </p:commandButton>
+                                <p:tooltip for="deletar" value="Deletar Comentário" position="left"/>
+                            </p:column>
+                        </p:dataTable>
+
+                        <p:separator style="margin-bottom: 2em; margin-top: 2em"/>
+                        <div id="frequencias-content" class="flex flex-column">
+                            <h2 class="col-12 mb-3 title" > <i class="pi pi-users" style="font-size: 24px;margin-right:8px"></i>Lista de Frequências</h2>
+
+                            <p:dataTable id="dt-servidores-reuniao" widgetVar="dtServidoresReuniao" value="#{reuniaoController.frequencias}"
+                                         var="frequencia" emptyMessage="Nenhum servidor encontrado" styleClass="alunos-table" 
+                                         style="margin-top: 10px" paginator="false" 
+                                         rowKey="#{frequencia.frequenciaPK.servidorProntuario}"
+                                         rowIndexVar="index">
+                                <f:facet name="header">
+                                    <div class="p-d-flex p-ai-center p-jc-between">
+                                        <span>Frequências da Reunião</span>
+                                    </div>
+                                    <div class="p-d-flex p-ai-center p-jc-between" style="margin-top:15px;">
+                                        <p:selectOneMenu id="tipo_create" value="#{reuniaoController.tipo}">
+                                            <p:ajax update="dt-servidores-reuniao" listener="#{reuniaoController.filtrarTipo()}"/>
+                                            <f:selectItem itemLabel="Selecione um tipo de Servidor" itemValue=""/>
+                                            <f:selectItem itemLabel="PROFESSOR" itemValue="PROFESSOR"/>
+                                            <f:selectItem itemLabel="TAE" itemValue="TAE"/>
+                                            <f:selectItem itemLabel="AMBOS" itemValue="AMBOS"/>
+                                        </p:selectOneMenu>
+                                    </div>
+                                </f:facet>
+
+                                <p:column headerText="Prontuário" sortBy="#{frequencia.servidor.prontuario}" filterBy="#{frequencia.servidor.prontuario}">
+                                    <h:outputText value="#{frequencia.servidor.prontuario}" />
+                                </p:column>
+
+                                <p:column headerText="Nome" sortBy="#{frequencia.servidor.nome}" filterBy="#{frequencia.servidor.nome}">
+                                    <h:outputText value="#{frequencia.servidor.nome}" />
+                                </p:column>
+
+                                <p:column headerText="Justificativa da falta">
+                                    <h:outputText value="#{frequencia.descricao}" rendered="#{frequencia.frequencia eq false}"/>
+                                </p:column>
+                                <p:column headerText="Presença">
+                                    <p:selectBooleanCheckbox id="presenca" value="#{frequencia.frequencia}" disabled="true"/>
+                                </p:column>
+
+                                <p:column headerText="Ações" exportable="false">
+                                    <p:commandButton disabled="#{frequencia.frequencia eq false}" id="falta" icon="pi pi-pencil" update="form:create-falta-content"
+                                                     styleClass="edit-button rounded-button" process="@this" oncomplete="PF('createFaltaDialog').show()">
+                                        <f:setPropertyActionListener value="#{frequencia}" target="#{reuniaoController.frequenciaAtual}"/>
+                                        <p:resetInput target="create-falta-content"/>
+                                    </p:commandButton>
+                                    <p:commandButton disabled="#{frequencia.frequencia eq true}" id="remover-falta" icon="pi pi-times" oncomplete="PF('removeFaltaDialog').show()" 
+                                                     styleClass="ui-button-danger rounded-button" process="@this" style="margin-left: 8px">
+                                        <f:setPropertyActionListener value="#{frequencia}" target="#{reuniaoController.frequenciaAtual}"/>
+                                    </p:commandButton>
+                                    <p:tooltip for="falta" value="Lançar falta" position="left"/>
+                                    <p:tooltip for="remover-falta" value="Remover falta" position="right"/> 
+                                </p:column>                            
+                            </p:dataTable>
+                        </div>
+
+                        <p:dialog header="Lançar Falta" showEffect="fade" modal="true"
+                                  widgetVar="createFaltaDialog" responsive="true" fitViewport="true">
+                            <p:outputPanel id="create-falta-content" class="ui-fluid">
+                                <div class="p-field">
+                                    <p:outputLabel for="descricao_create">Justificativa</p:outputLabel>
+                                    <p:inputTextarea id="descricao_create" value="#{reuniaoController.frequenciaAtual.descricao}" required="false"/>
+                                </div>
+                            </p:outputPanel>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Salvar" icon="pi pi-check" actionListener="#{reuniaoController.adicionarFalta()}"
+                                                 update="form:create-falta-content" process="form:create-falta-content @this"/>
+                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('createFaltaDialog').hide()"
+                                                 class="ui-button-secondary"/>
+                            </f:facet>
+                        </p:dialog>
+
+
+                        <p:confirmDialog widgetVar="removeFaltaDialog" showEffect="fade" width="300"
+                                         message="Deseja remover esta falta?" header="Confirmação" severity="warn">
+                            <p:commandButton value="Sim" icon="pi pi-check" actionListener="#{reuniaoController.removerFalta()}"
+                                             process="@this" oncomplete="PF('removeFaltaDialog').hide()" update="form:dt-servidores-reuniao"/>
+                            <p:commandButton value="Não" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                             onclick="PF('removeFaltaDialog').hide()"/>
+                        </p:confirmDialog> 
+
+                        <p:confirmDialog widgetVar="deleteArquivoDialog" showEffect="fade" width="300"
+                                         message="Deseja remover este arquivo?" header="Confirmação" severity="warn">
+                            <p:commandButton value="Sim" icon="pi pi-check" actionListener="#{reuniaoController.removerArquivo()}"
+                                             process="@this" oncomplete="PF('deleteArquivoDialog').hide()" update="dt-arquivos"/>
+                            <p:commandButton value="Não" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                             onclick="PF('deleteArquivoDialog').hide()"/>
+                        </p:confirmDialog>
+
+                        <p:confirmDialog widgetVar="deleteComentarioDialog" showEffect="fade" width="300"
+                                         message="Deseja remover este comentário?" header="Confirmação" severity="warn">
+                            <p:commandButton value="Sim" icon="pi pi-check" actionListener="#{reuniaoController.removerComentario()}"
+                                             process="@this" oncomplete="PF('deleteComentarioDialog').hide()" update="dt-comentarios"/>
+                            <p:commandButton value="Não" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                             onclick="PF('deleteComentarioDialog').hide()"/>
+                        </p:confirmDialog>
+
+                        <p:confirmDialog widgetVar="resetFromDialog" showEffect="fade" width="300"
+                                         message="Deseja limpar o formulário?" header="Confirmação" severity="warn">
+                            <p:commandButton value="Sim" icon="pi pi-check" action="#{reuniaoController.openNew()}"
+                                             process="@this" oncomplete="PF('resetFromDialog').hide()" update="form"/>
+                            <p:commandButton value="Não" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                             onclick="PF('resetFromDialog').hide()"/>
+                        </p:confirmDialog>
+                    </div>
+
+                    <div class="flex justify-content-center gap-3">     
+                        <p:commandButton id="submitBtn" class="mt-5" style="max-width: 220px;width:100%" icon="pi pi-check" value="Cadastrar Reunião" 
+                                         update="messages" action="#{reuniaoController.cadastrarReuniao()}"/> 
+                        
+                        <p:commandButton class="mt-5" style="max-width: 220px;width:100%; background-color: #86912c !important" 
+                                         value="Limpar o Formulário" process="@this" oncomplete="PF('resetFromDialog').show()"
+                                         icon="pi pi-delete-left" update="messages" action="#{reuniaoController.openNew()}"/>
+                    </div>
+
+                </h:form>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>

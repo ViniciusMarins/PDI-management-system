@@ -1,0 +1,222 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+        <ui:composition template="/pages/home.xhtml">
+            <ui:define name="content">
+                <f:metadata>
+                    <f:viewAction action="#{servidorSimulacaoController.fillServidoresSimulacaoList()}" />
+                </f:metadata>
+                <div class="card">
+                    <h:form id="form">
+                        <p:growl id="messages" showDetail="true"/>
+
+                        <p:breadCrumb>
+                            <p:menuitem outcome="/pages/home.xhtml" value="Home"/>
+                            <p:menuitem outcome="/pages/gerenciamento/servidoresSimulacao.xhtml" value="Gerenciamento de Servidores da Simulação"/>
+                        </p:breadCrumb>
+
+                        <p:dataTable id="dt-servidores" widgetVar="dtServidores" var="servidor" value="#{servidorSimulacaoController.servidoresSimulacao}"
+                                     emptyMessage="Nenhum servidor encontrado" rowKey="#{servidor.idProfessor}" styleClass="servidor-table"
+                                     style="margin-top: 10px" paginator="true" rows="10" paginatorPosition="bottom">
+
+                            <f:facet name="header">
+                                <div class="flex align-items-center justify-content-between">
+                                    <span>Servidores</span>
+                                    <div>
+                                        <p:commandButton id="refresh"  action="#{servidorSimulacaoController.fillServidoresSimulacaoList()}" style="margin-right: 7px"
+                                                         process="@this" update="form:dt-servidores" icon="pi pi-replay" styleClass="rounded-button" />
+                                        <p:commandButton value="Cadastrar" icon="pi pi-plus"
+                                                         update=":dialogs:create-servidor-content" oncomplete="PF('createServidorDialog').show()"
+                                                         style="margin-right: .5rem">
+                                            <p:resetInput target=":dialogs:create-servidor-content"/>
+                                        </p:commandButton>
+
+                                        <p:commandButton id="toggler" type="button" value="Campos" icon="pi pi-align-justify"/>
+                                        <p:columnToggler datasource="dt-servidores" trigger="toggler">
+                                            <p:ajax />
+                                        </p:columnToggler>
+
+                                        <p:tooltip for="refresh" value="Recarregar Tabela" position="top"/>
+                                        <p:tooltip for="toggler" value="Campos da Tabela" position="top"/>
+                                    </div>
+                                </div>
+                            </f:facet>
+
+                            <p:column headerText="Nome" sortBy="#{servidor.nome}" filterBy="#{servidor.nome}" filterMatchMode="contains">
+                                <h:outputText value="#{servidor.nome}"  />
+                            </p:column>
+
+                            <p:column headerText="Tipo" sortBy="#{servidor.tipo}" filterBy="#{servidor.tipo}" filterMatchMode="contains">
+                                <h:outputText value="#{servidor.tipo}"  />
+                            </p:column>
+
+                            <p:column headerText="Área de Concurso" sortBy="#{servidor.idArea}" filterBy="#{servidor.idArea.descricao}" filterMatchMode="contains">
+                                <h:outputText value="#{servidor.idArea.descricao}"  />
+                            </p:column>
+
+                            <p:column headerText="Área de Lotação" sortBy="#{servidor.idLotacao}" filterBy="#{servidor.idLotacao.descricao}" filterMatchMode="contains">
+                                <h:outputText value="#{servidor.idLotacao.descricao}"  />
+                            </p:column>
+
+                            <p:column headerText="Ativado na simulação" sortBy="#{servidor.status}" filterBy="#{servidor.status}" filterMatchMode="contains">
+                                <p:selectBooleanCheckbox value="#{servidor.status}" >
+                                    <p:ajax event="change" listener="#{servidorSimulacaoController.alterarServidor(servidor)}" update="form:dt-servidores" />
+                                </p:selectBooleanCheckbox>
+                            </p:column>
+                            <p:column headerText="Ações" exportable="false">
+                                <p:commandButton icon="pi pi-pencil" id="editar" update=":dialogs:edit-servidor-content"
+                                                 oncomplete="PF('editServidorDialog').show()"
+                                                 styleClass="edit-button rounded-button" process="@this">
+                                    <f:setPropertyActionListener value="#{servidor}" target="#{servidorSimulacaoController.servidor}"/>
+                                    <p:resetInput target=":dialogs:edit-servidor-content"/>
+                                </p:commandButton>
+                                <p:tooltip for="editar" value="Editar Servidor" position="left"/>
+
+                                <p:commandButton icon="pi pi-trash" id="deletar" style="margin-left: 7px;"
+                                                 oncomplete="PF('deleteServidorDialog').show()" 
+                                                 styleClass="ui-button-danger rounded-button" process="@this"
+                                                 update="dialogs">
+                                    <f:setPropertyActionListener value="#{servidor}" target="#{servidorSimulacaoController.servidor}"/>
+                                </p:commandButton>
+                                <p:tooltip for="deletar" value="Deletar Servidor" position="left"/>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+
+
+                    <h:form id="dialogs">
+                        <p:growl id="msg" showDetail="true"/>
+                        <p:dialog header="Cadastrar Servidor" showEffect="fade" modal="true"
+                                  minimizable="true" maximizable="true" closeOnEscape="true"
+                                  widgetVar="createServidorDialog" responsive="true" fitViewport="true">
+                            <p:outputPanel id="create-servidor-content" class="ui-fluid">
+                                <p:outputPanel rendered="#{not empty servidorSimulacaoController.servidor}">
+                                    <div class="p-field">
+                                        <p:outputLabel for="nome_create">Nome</p:outputLabel>
+                                        <p:inputText id="nome_create" value="#{servidorSimulacaoController.servidor.nome}" required="true" requiredMessage="Nome do servidor é obrigatório."/>
+                                    </div>
+
+                                    <div class="field">
+                                        <p:outputLabel for="tipo_create">Tipo</p:outputLabel>
+                                        <p:selectOneMenu id="tipo_create" value="#{servidorSimulacaoController.servidor.tipo}" required="true" requiredMessage="Tipo do servidor é obrigatório.">
+                                            <p:ajax update="dialogs:area_create" />
+                                            <f:selectItem itemLabel="Selecione um Tipo" itemValue=""/>
+                                            <f:selectItem itemLabel="PROFESSOR" itemValue="PROFESSOR"/>
+                                            <f:selectItem itemLabel="TAE" itemValue="TAE"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="field">
+                                        <p:outputLabel for="area_create">Área de Concurso</p:outputLabel>
+                                        <p:selectOneMenu id="area_create" value="#{servidorSimulacaoController.servidor.idArea}"
+                                                         required="true" requiredMessage="Selecione uma Área de Concurso" 
+                                                         converter="#{areaConverter}" disabled="#{servidorSimulacaoController.servidor.tipo ne 'PROFESSOR'}">
+                                            <f:selectItem itemLabel="Selecione a Área de Concurso" itemValue=""/>
+                                            <f:selectItems value="#{areaController.areas}" var="area"
+                                                           itemLabel="#{area.descricao}" itemValue="#{area}"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="field">
+                                        <p:outputLabel for="lotacao_create">Área de Lotação</p:outputLabel>
+                                        <p:selectOneMenu id="lotacao_create" value="#{servidorSimulacaoController.servidor.idLotacao}"
+                                                         required="true" requiredMessage="Selecione uma Área de Lotação" converter="#{cursoConverter}">
+                                            <f:selectItem itemLabel="Selecione a Área de Lotação" itemValue=""/>
+                                            <f:selectItems value="#{lotacaoController.lotacoes}" var="lotacaoId"
+                                                           itemLabel="#{lotacaoId.descricao}" itemValue="#{lotacaoId}"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="field">
+                                        <p:selectBooleanCheckbox id="pdi_create" value="#{servidorSimulacaoController.servidor.status}" itemLabel="   Ativado na simulação"/>
+                                    </div>
+                                </p:outputPanel>
+                            </p:outputPanel>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Cadastrar" icon="pi pi-check" actionListener="#{servidorSimulacaoController.cadastrarServidor()}"
+                                                 update="create-servidor-content msg" process="create-servidor-content @this"/>
+                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('createServidorDialog').hide()"
+                                                 class="ui-button-secondary"/>
+                            </f:facet>
+                        </p:dialog>
+
+                        <p:dialog header="Editar Servidor" showEffect="fade" modal="true"
+                                  minimizable="true" maximizable="true" closeOnEscape="true"
+                                  widgetVar="editServidorDialog" responsive="true" fitViewport="true">
+                            <p:outputPanel id="edit-servidor-content" class="ui-fluid">
+                                <p:outputPanel rendered="#{not empty servidorSimulacaoController.servidor}">
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="nome_edit">Nome</p:outputLabel>
+                                        <p:inputText id="nome_edit" value="#{servidorSimulacaoController.servidor.nome}" required="true" requiredMessage="Nome do servidor é obrigatório."/>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="tipo_edit">Tipo</p:outputLabel>
+                                        <p:selectOneMenu id="tipo_edit" value="#{servidorSimulacaoController.servidor.tipo}" required="true" requiredMessage="Tipo do servidor é obrigatório.">
+                                            <p:ajax update="dialogs:curso_create" listener="#{servidorSimulacaoController.voltarArea()}"/>
+                                            <f:selectItem itemLabel="Selecione um Tipo" itemValue=""/>
+                                            <f:selectItem itemLabel="PROFESSOR" itemValue="PROFESSOR"/>
+                                            <f:selectItem itemLabel="TAE" itemValue="TAE"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="curso_create">Área de Concurso</p:outputLabel>
+                                        <p:selectOneMenu id="curso_create" value="#{servidorSimulacaoController.servidor.idArea}"
+                                                         required="false" requiredMessage="Selecione uma Área de Concurso" 
+                                                         converter="#{areaConverter}" disabled="#{servidorSimulacaoController.servidor.tipo ne 'PROFESSOR' or servidorSimulacaoController.servidor.tipo eq ''}">
+                                            <f:selectItem itemLabel="Selecione a Área de Concurso" itemValue=""/>
+                                            <f:selectItems value="#{areaController.areas}" var="areaId"
+                                                           itemLabel="#{areaId.descricao}" itemValue="#{areaId}"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="lotacao_edit">Área de Lotação</p:outputLabel>
+                                        <p:selectOneMenu id="lotacao_edit" value="#{servidorSimulacaoController.servidor.idLotacao}"
+                                                         required="false" requiredMessage="Selecione uma Área de Lotação" converter="#{lotacaoConverter}">
+                                            <f:selectItem itemLabel="Selecione a Área de Lotação" itemValue=""/>
+                                            <f:selectItems value="#{lotacaoController.lotacoes}" var="lotacaoId"
+                                                           itemLabel="#{lotacaoId.descricao}" itemValue="#{lotacaoId}"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:selectBooleanCheckbox id="pdi_edit" value="#{servidorSimulacaoController.servidor.status}" itemLabel="   Ativado na simulação"/>
+                                    </div>
+                                </p:outputPanel>
+                            </p:outputPanel>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Editar" icon="pi pi-check" actionListener="#{servidorSimulacaoController.editarServidor()}"
+                                                 update="edit-servidor-content msg" process="edit-servidor-content @this"/>
+                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('editServidorDialog').hide()"
+                                                 class="ui-button-secondary"/>
+                            </f:facet>
+                        </p:dialog>
+                        
+                        
+                            <p:confirmDialog widgetVar="deleteServidorDialog" showEffect="fade" width="300"
+                                         message="Deseja remover o servidor #{servidorSimulacaoController.servidor.nome} ?" header="Confirmação" severity="warn">
+                            <p:commandButton value="Sim" icon="pi pi-check" actionListener="#{servidorSimulacaoController.removerServidor()}"
+                                             process="@this" oncomplete="PF('deleteServidorDialog').hide()" update="messages"/>
+                            <p:commandButton value="Não" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                             onclick="PF('deleteServidorDialog').hide()"/>
+                        </p:confirmDialog>
+                       
+                        
+                    </h:form>
+                </div>
+
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link rel="shortcut icon" type="image/x-icon" href="#{resource['img/icon.png']}"/>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+        <title>Login</title>
+        <h:outputStylesheet name="css/cssLayout.css"/>
+
+        <h:outputStylesheet rendered="#{loginController.tema eq 'arya'}" name="css/global-black.css" />
+        <h:outputStylesheet rendered="#{loginController.tema eq 'saga'}" name="css/global-white.css" />
+
+        <h:outputStylesheet name="css/pflex.css"/>
+    </h:head>
+
+    <h:body style="display: flex; flex: 1; align-items: center; justify-content: center; height: 100vh; padding: 16px">
+        <p:growl id="messages" showDetail="true" />
+
+        <h:form class="login-container">
+            <p:graphicImage rendered="#{loginController.tema eq 'arya'}" style="width:250px;margin:0 auto;margin-bottom: 32px" name="img/logo_sapdi.png" />
+            <p:graphicImage rendered="#{loginController.tema eq 'saga'}" style="width:250px;margin:0 auto;margin-bottom: 32px" name="img/logo_sapdi_branca.png" />
+
+
+            <label for="prontuario" class="col-6" style="padding: 0 !important">
+                Prontuário
+            </label>
+            <p:inputMask mask="AA99999*"  validateMask="true" value="#{loginController.prontuario}" id="prontuario" class="col-12 input" required="true" requiredMessage="Campo de Prontuário é obrigatório." style="margin-bottom: 8px"/>
+
+            <label for="senha" class="col-6" style="padding: 0 !important">
+                Senha
+            </label>
+            <p:password class="col-12 input" id="toggle" value="#{loginController.senha}" required="true" requiredMessage="Campo de Senha é obrigatório." toggleMask="true" redisplay="true"/>
+
+            <p:commandButton class="mt-4" icon="pi pi-check" value="Acessar" update="messages" action="#{loginController.login()}"/>
+
+            <p:commandLink process="@this" id="alterarSenha" oncomplete="PF('createRedefinirDialog').show()" class="mt-2 text-blue-400"
+                           value="Esqueci minha senha."/>
+        </h:form>
+
+        <p:dialog header="Redefinir Senha" showEffect="fade" modal="true"
+                  widgetVar="createRedefinirDialog" responsive="true" fitViewport="true">
+            <h:form id='recuperar-senha-content'>
+
+                <p:outputPanel id="recuperar-senha-content" class="ui-fluid">
+                    <div class="p-field">
+                        <p:outputLabel for="recuperar_login">Prontuário</p:outputLabel>
+                        <p:inputMask  mask="AA99999*"  validateMask="true"  id="recuperar_login" value="#{loginController.loginRedefinicao}" required="true" requiredMessage="Prontuário é obrigatório."/>
+                    </div>
+                </p:outputPanel>
+
+                <p:commandButton style='margin-top: 16px; margin-right: 8px' value="Solicitar" icon="pi pi-check" actionListener="#{loginController.solicitarRedefinicao()}"
+                                 update="recuperar-senha-content messages" />
+                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('createRedefinirDialog').hide()"
+                                 class="ui-button-secondary"/>
+            </h:form>
+
+        </p:dialog>
+    </h:body>
+</html>
+

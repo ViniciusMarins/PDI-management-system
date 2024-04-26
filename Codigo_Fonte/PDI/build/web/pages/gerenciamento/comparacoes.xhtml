@@ -1,0 +1,247 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+        <ui:composition template="/pages/home.xhtml">  
+            <ui:define name="content" >
+                <style>
+                    body .ui-button.ui-button-icon-only .ui-icon{
+                        font-size: 22px;
+                        top:43%!important;
+                        left:43%!important;
+                    }
+
+                    body .ui-widget-overlay{
+                        display: none!important;
+                    }
+                </style>
+                <f:metadata>
+                    <f:viewAction action="#{simulacaoController.gerarSimulacaoAtual()}" />
+                </f:metadata>
+                <h:form id="form_simulacao" >         
+                    <p:breadCrumb style="margin-bottom: 10px">
+                        <p:menuitem outcome="/pages/home" value="Home"/>
+                        <p:menuitem outcome="/pages/gerenciamento/comparacoes" value="Comparações de Simulação"/>
+                    </p:breadCrumb>
+                    <p:card class="mb-3 title">
+                        <div class="flex justify-content-between mb-2">
+                            <h1>Cenário 1</h1>
+
+                            <p:commandButton id="logsSimulacao" style="border-radius:50%;width:50px;height: 50px !important" icon="pi pi-copy" 
+                                             update="messages, form_simulacao,:dialogs:logs-simulacao-content" 
+                                             oncomplete="PF('logsSimulacaoDialog').show()" >
+                                <p:resetInput target=":dialogs:logs-simulacao-content"/>
+                            </p:commandButton>
+
+
+                            <p:tooltip for="logsSimulacao" value="Logs da Simulação" position="top"/>
+                        </div>
+                        <div class="flex justify-content-between">
+                            <p:selectOneMenu id="select_simulacao1" 
+                                             required="false"
+                                             filter="true" filterMatchMode="contains"
+                                             value="#{simulacaoController.simulacao1}"
+                                             converter="#{simulacaoConverter}"
+                                             >
+
+                                <f:selectItem itemLabel="Selecione a Simulação" itemValue=""/>
+                                <f:selectItems noSelectionValue="null" value="#{simulacaoController.simulacoes}" var="simulacao" 
+                                               itemLabel="#{simulacao.titulo}" itemValue="#{simulacao}"/>
+                                <p:ajax event="change" update="form_simulacao,dt-simulacao1, dt-simulacao2, card_2" ></p:ajax>
+                            </p:selectOneMenu>
+                        </div>
+                        <br />
+                        <h1><h:outputText id="titulo" class="mb-3" value="${simulacaoController.simulacao1.titulo}" /></h1>
+                        <h:outputText id="descricao" value="${simulacaoController.simulacao1.descricao}" />
+
+                        <p:dataTable id="dt-simulacao1" widgetVar="dtSimulacoes-1" var="simulacao" value="#{simulacaoController.simulacao1.dadosSimulacaoList}"
+                                     emptyMessage="Nenhuma simulação encontrada" styleClass="simulacoes-table" rowKey="#{simulacao.idDadosSimulacao}"
+                                     style="margin-top: 10px" reflow="true" 
+                                     rowStyleClass="#{simulacao.mediaAnual eq 0.0 ? '' : simulacao.mediaAnual ge simulacaoController.sinalizadorSobreCargaAlta ? 'highlight_red'
+                                                      : simulacao.mediaAnual ge simulacaoController.sinalizadorSobreCargaMedia ? 'highlight_yellow' : 'highlight_blue'} "
+                                     >
+
+
+                            <p:column headerText="Área" sortBy="#{simulacao.area}" filterBy="#{simulacao.area}" filterMatchMode="contains">
+                                <h:outputText value="#{simulacao.area}" />
+                            </p:column>
+                            <p:column headerText="Num. Professores" sortBy="#{simulacao.numProfs}">
+                                <h:outputText value="#{simulacao.numProfs}" />
+                            </p:column>
+
+                            <p:column headerText="Principal Par" sortBy="#{simulacao.parPrincipal}">
+                                <h:outputText value="#{simulacao.parPrincipal}" />
+                            </p:column>
+
+                            <p:column headerText="Parcial Par" sortBy="#{simulacao.parParcial}">
+                                <h:outputText value="#{simulacao.parParcial}" />
+                            </p:column>
+
+                            <p:column headerText="Integral Par" sortBy="#{simulacao.parIntegral}">
+                                <h:outputText value="#{simulacao.parIntegral}" />
+                            </p:column>
+
+                            <p:column headerText="Aulas/Prof - Sem. Par" sortBy="#{simulacao.mediaPar}">
+                                <h:outputText value="#{simulacao.mediaPar}">
+                                    <f:convertNumber pattern="#0.00" locale="pt_BR"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Principal Impar" sortBy="#{simulacao.imparPrincipal}">
+                                <h:outputText value="#{simulacao.imparPrincipal}" />
+                            </p:column>
+
+                            <p:column headerText="Parcial Impar" sortBy="#{simulacao.imparParcial}">
+                                <h:outputText value="#{simulacao.imparParcial}" />
+                            </p:column>
+
+                            <p:column headerText="Integral Impar" sortBy="#{simulacao.imparIntegral}">
+                                <h:outputText value="#{simulacao.imparIntegral}" />
+                            </p:column>
+
+                            <p:column headerText="Aulas/Prof - Sem. Impar" sortBy="#{simulacao.mediaImpar}">
+                                <h:outputText value="#{simulacao.mediaImpar}">
+                                    <f:convertNumber pattern="#0.00" locale="pt_BR"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Aulas/Prof - Média Anual" sortBy="#{simulacao.mediaAnual}">
+                                <h:outputText value="#{simulacao.mediaAnual}">
+                                    <f:convertNumber pattern="#0.00" locale="pt_BR"/>
+                                </h:outputText>
+                            </p:column>
+
+                        </p:dataTable>
+                    </p:card>
+                    <p:card id='card_2' rendered="#{not empty simulacaoController.simulacao1}" class="mb-3 title">
+                        <div class="flex justify-content-between mb-2">
+                            <h1>Cenário 2</h1>
+
+                            <p:commandButton id="logsSimulacao2" style="border-radius:50%;width:50px" icon="pi pi-copy" 
+                                             update="messages, form_simulacao,:dialogs:logs-simulacao-content2" 
+                                             oncomplete="PF('logsSimulacaoDialog2').show()" >
+                                <p:resetInput target=":dialogs:logs-simulacao-content2"/>
+                            </p:commandButton>
+
+
+                            <p:tooltip for="logsSimulacao2" value="Logs da Simulação" position="top"/>
+                        </div>
+                        <div class="flex justify-content-between">
+                            <p:selectOneMenu id="select_simulacao2" 
+                                             required="false"
+                                             filter="true" filterMatchMode="contains"
+                                             value="#{simulacaoController.simulacao2}"
+                                             converter="#{simulacaoConverter}"
+                                             >
+
+                                <f:selectItem itemLabel="Selecione a Simulação" itemValue=""/>
+                                <f:selectItems noSelectionValue="null" value="#{simulacaoController.simulacoes}" var="simulacao" 
+                                               itemLabel="#{simulacao.titulo}" itemValue="#{simulacao}"/>
+                                <p:ajax event="change" update="form_simulacao,dt-simulacao2" ></p:ajax>
+                            </p:selectOneMenu>
+                        </div>
+                        <br />
+                        <h1><h:outputText class="mb-3" value="#{simulacaoController.simulacao2.titulo}" /></h1>
+                        <h:outputText value="#{simulacaoController.simulacao2.descricao}" />
+
+                        <p:dataTable id="dt-simulacao2" widgetVar="dtSimulacoes-2" var="simulacao" value="#{simulacaoController.simulacaoComparacao.dadosSimulacaoList}"
+                                     emptyMessage="Nenhuma simulação encontrada" styleClass="simulacoes-table" rowKey="#{simulacao.idDadosSimulacao}"
+                                     style="margin-top: 10px" reflow="true" 
+                                     rowStyleClass="#{simulacao.mediaAnual eq 0.0 ? '' : simulacao.mediaAnual ge simulacaoController.sinalizadorSobreCargaAlta ? 'highlight_red'
+                                                      : simulacao.mediaAnual ge simulacaoController.sinalizadorSobreCargaMedia ? 'highlight_yellow' : 'highlight_blue'} #{(not empty simulacaoController.simulacao1) and (simulacao.getComparar(simulacaoController.simulacao1.dadosSimulacaoList) eq 1) ? 'opacidade' : ''}"
+                                     >
+
+
+                            <p:column headerText="Área" sortBy="#{simulacao.area}" filterBy="#{simulacao.area}" filterMatchMode="contains">
+                                <h:outputText value="#{simulacao.area}" />
+                            </p:column>
+                            <p:column headerText="Num. Professores" sortBy="#{simulacao.numProfs}">
+                                <h:outputText value="#{simulacao.numProfs}" />
+                            </p:column>
+
+                            <p:column headerText="Principal Par" sortBy="#{simulacao.parPrincipal}">
+                                <h:outputText value="#{simulacao.parPrincipal}" />
+                            </p:column>
+
+                            <p:column headerText="Parcial Par" sortBy="#{simulacao.parParcial}">
+                                <h:outputText value="#{simulacao.parParcial}" />
+                            </p:column>
+
+                            <p:column headerText="Integral Par" sortBy="#{simulacao.parIntegral}">
+                                <h:outputText value="#{simulacao.parIntegral}" />
+                            </p:column>
+
+                            <p:column headerText="Aulas/Prof - Sem. Par" sortBy="#{simulacao.mediaPar}">
+                                <h:outputText value="#{simulacao.mediaPar}">
+                                    <f:convertNumber pattern="#0.00" locale="pt_BR"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Principal Impar" sortBy="#{simulacao.imparPrincipal}">
+                                <h:outputText value="#{simulacao.imparPrincipal}" />
+                            </p:column>
+
+                            <p:column headerText="Parcial Impar" sortBy="#{simulacao.imparParcial}">
+                                <h:outputText value="#{simulacao.imparParcial}" />
+                            </p:column>
+
+                            <p:column headerText="Integral Impar" sortBy="#{simulacao.imparIntegral}">
+                                <h:outputText value="#{simulacao.imparIntegral}" />
+                            </p:column>
+
+                            <p:column headerText="Aulas/Prof - Sem. Impar" sortBy="#{simulacao.mediaImpar}">
+                                <h:outputText value="#{simulacao.mediaImpar}">
+                                    <f:convertNumber pattern="#0.00" locale="pt_BR"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Aulas/Prof - Média Anual" sortBy="#{simulacao.mediaAnual}">
+                                <h:outputText value="#{simulacao.mediaAnual}">
+                                    <f:convertNumber pattern="#0.00" locale="pt_BR"/>
+                                </h:outputText>
+                            </p:column>
+
+                        </p:dataTable>
+                    </p:card>
+                </h:form>
+
+                <h:form id="dialogs">
+                    <p:growl id="msg" showDetail="true"/>        
+                    <p:dialog showEffect="fade" modal="true"
+                              minimizable="true" maximizable="true" 
+                              widgetVar="logsSimulacaoDialog" responsive="true" fitViewport="true">
+                        <p:outputPanel id="logs-simulacao-content" class="ui-fluid">
+                            
+                            <p:outputPanel rendered="#{not empty simulacaoController.simulacaoAtual}">
+                                <h2>Logs da #{simulacaoController.simulacao1.titulo}</h2>
+                                <div class="p-field">
+                                    <h:outputText style="line-height: 16px !important" value="#{simulacaoController.simulacao1.logs}" escape="false" />
+                                </div>
+                            </p:outputPanel>
+                        </p:outputPanel>
+                    </p:dialog>
+
+                    <p:dialog showEffect="fade" modal="true"
+                              minimizable="true" maximizable="true"
+                              widgetVar="logsSimulacaoDialog2" responsive="true" fitViewport="true">
+                        <p:outputPanel id="logs-simulacao-content2" class="ui-fluid">
+                            
+                            <p:outputPanel rendered="#{not empty simulacaoController.simulacaoAtual}">
+                                <h2>Logs da #{simulacaoController.simulacao2.titulo}</h2>
+                                <div class="p-field">
+                                    <h:outputText style="line-height: 16px !important" value="#{simulacaoController.simulacao2.logs}" escape="false" />
+                                </div>
+                            </p:outputPanel>
+                        </p:outputPanel>
+                    </p:dialog>
+                </h:form>
+
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

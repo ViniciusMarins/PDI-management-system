@@ -1,0 +1,284 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link rel="shortcut icon" type="image/x-icon" href="#{resource['img/icon.png']}"/>
+        <h:outputStylesheet name="css/cssLayout.css"/>
+
+
+
+        <h:outputStylesheet rendered="#{loginController.tema eq 'arya'}" name="css/global-black.css" />
+        <h:outputStylesheet rendered="#{loginController.tema eq 'saga'}" name="css/global-white.css" />
+
+        <h:outputStylesheet name="css/pflex.css"/>
+        <title>IFSP - SAPDI</title>
+
+        <style>
+            .icons{
+                font-size: 22px!important;
+                top:43%!important;
+                left:43%!important;
+            }
+        </style>
+    </h:head>
+
+    <h:body style="padding: 16px">
+        <f:metadata>
+            <f:viewAction action="#{simulacaoController.gerarSimulacaoAtual()}" />
+            <f:viewAction action="#{simulacaoController.initSinalizadores()}" />
+        </f:metadata>
+        <div id="top">
+            <ui:insert name="top">
+                <p:growl id="messages" showDetail="true"/>
+                <p:card style="padding-left: 10px">
+                    <p:graphicImage rendered="#{loginController.tema eq 'arya'}" style="" name="img/logo_ifsp_branco_pep.png" />
+                    <p:graphicImage rendered="#{loginController.tema eq 'saga'}" style="filter: invert(0.6);" name="img/logo_ifsp_branco_pep.png" />
+                </p:card>
+            </ui:insert>
+        </div>
+
+
+        <div id="left">
+            <ui:insert name="left">
+                <h:form >
+
+                    <p:tieredMenu id="menu" overlay="true" trigger="form_data:dynaButton" my="left top" at="left bottom" style="width:250px; min-width: 250px; margin-top: 10px; padding: 0px;">
+                        <p:menuitem outcome="/pages/home" value="Home" icon="pi pi-home"/>
+                        <p:menuitem outcome="/pages/gerenciamento/servidores" value="Servidores" icon="pi pi-id-card"/>
+
+                        <p:submenu label="Reuniões" icon="pi pi-comments">
+                            <p:menuitem outcome="/pages/reuniao/cadastrar" value="Cadastrar Reunião" icon="pi pi-plus"/>
+                            <p:menuitem outcome="/pages/reuniao/consultar" value="Consultar" icon="pi pi-search"/>
+                        </p:submenu>
+                        <p:submenu label="Simulação" icon="pi pi-cog">
+                            <p:menuitem outcome="/pages/gerenciamento/areas_lotacao" value="Áreas de Lotação" icon="pi pi-sitemap"/>
+                            <p:menuitem outcome="/pages/gerenciamento/areas_concurso" value="Áreas de Concurso" icon="pi pi-sitemap"/>
+                            <p:menuitem outcome="/pages/gerenciamento/cursos" value="Cursos" icon="pi pi-book"/>
+                            <p:menuitem outcome="/pages/gerenciamento/disciplinas" value="Disciplinas" icon="pi pi-book"/>
+                            <p:menuitem outcome="/pages/gerenciamento/servidoresSimulacao" value="Servidores (Para Simulação)" icon="pi pi-id-card"/>
+                            <p:menuitem outcome="/pages/gerenciamento/comparacoes" value="Comparar Simulações" icon="pi pi-sitemap"/>
+                        </p:submenu>
+
+                    </p:tieredMenu>
+
+                    <p:sticky target="menu"/>
+                </h:form>
+            </ui:insert>
+        </div>
+
+        <div id="content" class="left_content">
+
+            <h:form id="form_data">
+                <p:menubar style="max-height: 3.5rem !important; margin-bottom: 10px;">
+                    <p:menuitem id="dynaButton" value="Mostrar Menu"  icon="pi pi-list"/>
+
+                    <f:facet name="options">
+                        <p:menuButton value="#{loginController.servidorAutenticado.nome}" icon="pi pi-user" buttonStyleClass="ui-button-flat ui-button-plain">
+                            <p:menuitem value="Sair" icon="pi pi-power-off" immediate="true" action="#{loginController.logout()}"/>
+                            <p:divider />
+                            <p:menuitem value="Alterar Cadastro" icon="pi pi-user-edit"
+                                        update="edit-servidor-content"
+                                        oncomplete="PF('editServidorCadastroDialog').show()" process="@this"/>
+
+                            <p:menuitem value="Alterar Senha" icon="pi pi-unlock"
+                                        update="edit-servidor-senha-content"
+                                        oncomplete="PF('editSenhaServidorDialog').show()" process="@this"/>
+
+                            <p:menuitem value="Definir Sinalizadores" icon="pi pi-bookmark"
+                                        update="edit-sinalizadores-content"
+                                        oncomplete="PF('editSinalizadoresDialog').show()" process="@this"/>
+
+                            <p:menuitem value="Alternar Tema" icon="pi pi-palette" immediate="true" action="#{loginController.changeTema()}"/>
+
+                        </p:menuButton>
+                    </f:facet>
+
+                </p:menubar>
+                <ui:include src="/pages/alterar_cadastro/index.xhtml"/>
+            </h:form>
+            <ui:insert name="content">
+                <h:form id="form_simulacao">
+                    <p:card class="mb-3 title">
+                        <div class="flex justify-content-between">
+
+                            <h1>Professores Ativos/Área</h1>
+
+                            <div class="flex">
+                                <p:commandButton id="salvarSimulacao" class="mr-3" style="border-radius:50%;width:50px;height: 50px !important" icon="pi pi-save icons" 
+                                                 update="messages, form_simulacao,:dialogs:create-simulacao-content" 
+                                                 oncomplete="PF('createSimulacaoDialog').show()" >
+                                    <p:resetInput target=":dialogs:create-simulacao-content"/>
+                                </p:commandButton>
+
+
+                                <p:tooltip for="salvarSimulacao" value="Salvar Simulação" position="top"/>
+
+                                <p:commandButton id="refresh"  action="#{simulacaoController.gerarSimulacaoAtual()}" style="width:50px !important;height: 50px !important"
+                                                 process="@this" update="form_simulacao" icon="pi pi-replay icons" styleClass="rounded-button" />
+
+                                <p:tooltip for="refresh" value="Recarregar Simulação" position="top"/>
+
+                                <p:commandButton id="logsSimulacao" class="ml-3" style="border-radius:50%;width:50px;height: 50px !important" icon="pi pi-copy icons" 
+                                                 update="messages, form_simulacao,:dialogs:logs-simulacao-content" 
+                                                 oncomplete="PF('logsSimulacaoDialog').show()" >
+                                    <p:resetInput target=":dialogs:logs-simulacao-content"/>
+                                </p:commandButton>
+
+
+                                <p:tooltip for="logsSimulacao" value="Logs da Simulação" position="top"/>
+                            </div>
+
+                        </div>
+
+                        <p:separator style="margin-bottom: 2em; margin-top: 2em"/>
+                        <p:barChart id="grafico" model="#{simulacaoController.professoresModel1}" style="width: 100%; height: 500px;"/>
+                    </p:card>
+                    <p:card class="title ">
+                        <h1 >Resumo de Áreas</h1>
+                        <p:separator style="margin-bottom: 2em; margin-top: 2em"/>
+                        <div class="flex gap-3 mb-2">
+                            <div style="max-width: 250px;width: 100%">
+                                <p:outputLabel for="input1" value="Sinalizador Sobrecarga Alta"/><br/>
+                                <p:inputNumber modifyValueOnWheel="false" id="input1" value="#{simulacaoController.sinalizadorSobreCargaAlta}">
+                                    <p:ajax process="@this" update="dt-simulacao1"/>
+                                </p:inputNumber>
+                            </div>
+
+                            <div style="max-width: 250px;width: 100%">
+                                <p:outputLabel for="input2" value="Sinalizador Sobrecarga Média"/><br/>
+                                <p:inputNumber modifyValueOnWheel="false" id="input2" value="#{simulacaoController.sinalizadorSobreCargaMedia}">
+                                    <p:ajax process="@this" update="dt-simulacao1"></p:ajax>
+                                </p:inputNumber>
+                            </div>
+                        </div>
+                        <span class="font-bold text-red-300" style="font-size: 13px"> *Os Sinalizadores são baseados em Aulas/Prof-Média Anual</span>
+
+                        <p:dataTable id="dt-simulacao1" widgetVar="dtSimulacoes" var="simulacao" value="#{simulacaoController.simulacaoAtual.dadosSimulacaoList}"
+                                     emptyMessage="Nenhuma simulação encontrada" styleClass="simulacoes-table" rowKey="#{simulacao.idDadosSimulacao}"
+                                     style="margin-top: 10px" paginator="true" rows="10" paginatorPosition="bottom" reflow="true" 
+                                     rowStyleClass="#{simulacao.mediaAnual eq 0.0 ? '' : simulacao.mediaAnual ge simulacaoController.sinalizadorSobreCargaAlta ? 'highlight_red'
+                                                      : simulacao.mediaAnual ge simulacaoController.sinalizadorSobreCargaMedia ? 'highlight_yellow' : 'highlight_blue'}"
+                                     >
+
+
+                            <p:column headerText="Área" sortBy="#{simulacao.area}" filterBy="#{simulacao.area}" filterMatchMode="contains">
+                                <h:outputText value="#{simulacao.area}" />
+                            </p:column>
+
+                            <p:column headerText="Num. Professores" sortBy="#{simulacao.numProfs}">
+                                <h:outputText value="#{simulacao.numProfs}" />
+                            </p:column>
+
+                            <p:column headerText="Principal Par" sortBy="#{simulacao.parPrincipal}">
+                                <h:outputText value="#{simulacao.parPrincipal}" />
+                            </p:column>
+
+                            <p:column headerText="Parcial Par" sortBy="#{simulacao.parParcial}">
+                                <h:outputText value="#{simulacao.parParcial}" />
+                            </p:column>
+
+                            <p:column headerText="Integral Par" sortBy="#{simulacao.parIntegral}">
+                                <h:outputText value="#{simulacao.parIntegral}" />
+                            </p:column>
+
+                            <p:column headerText="Aulas/Prof - Sem. Par" sortBy="#{simulacao.mediaPar}">
+                                <h:outputText value="#{simulacao.mediaPar}">
+                                    <f:convertNumber pattern="#0.00" locale="pt_BR"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Principal Impar" sortBy="#{simulacao.imparPrincipal}">
+                                <h:outputText value="#{simulacao.imparPrincipal}" />
+                            </p:column>
+
+                            <p:column headerText="Parcial Impar" sortBy="#{simulacao.imparParcial}">
+                                <h:outputText value="#{simulacao.imparParcial}" />
+                            </p:column>
+
+                            <p:column headerText="Integral Impar" sortBy="#{simulacao.imparIntegral}">
+                                <h:outputText value="#{simulacao.imparIntegral}" />
+                            </p:column>
+
+                            <p:column headerText="Aulas/Prof - Sem. Impar" sortBy="#{simulacao.mediaImpar}">
+                                <h:outputText value="#{simulacao.mediaImpar}">
+                                    <f:convertNumber pattern="#0.00" locale="pt_BR"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Aulas/Prof - Média Anual" sortBy="#{simulacao.mediaAnual}">
+                                <h:outputText value="#{simulacao.mediaAnual}">
+                                    <f:convertNumber pattern="#0.00" locale="pt_BR"/>
+                                </h:outputText>
+                            </p:column>
+
+                        </p:dataTable>
+                    </p:card>
+                </h:form>
+
+                <h:form id="dialogs">
+                    <p:growl id="msg" showDetail="true"/>
+                    <p:dialog header="Salvar Simulação" showEffect="fade" modal="true"
+                              minimizable="true" maximizable="true"
+                              widgetVar="createSimulacaoDialog" responsive="true" fitViewport="true">
+                        <p:outputPanel id="create-simulacao-content" class="ui-fluid">
+
+                            <p:outputPanel rendered="#{not empty simulacaoController.simulacaoAtual}">
+                                <div class="p-field">
+                                    <p:outputLabel for="titulo_create">Título</p:outputLabel>
+                                    <p:inputText id="titulo_create" value="#{simulacaoController.simulacaoAtual.titulo}" required="true" requiredMessage="Título da simulação é obrigatória."/>
+                                </div>
+
+                                <div class="p-field">
+                                    <p:outputLabel for="descricao_create">Descrição</p:outputLabel>
+                                    <p:inputTextarea id="descricao_create" value="#{simulacaoController.simulacaoAtual.descricao}" required="true" requiredMessage="Descrição da simulação é obrigatória."/>
+                                </div>
+                            </p:outputPanel>
+                        </p:outputPanel>
+
+                        <f:facet name="footer">
+                            <p:commandButton value="Salvar" icon="pi pi-check" actionListener="#{simulacaoController.salvarSimulacaoAtual()}"
+                                             update="create-simulacao-content msg" process="create-simulacao-content @this"/>
+                            <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('createSimulacaoDialog').hide()"
+                                             class="ui-button-secondary"/>
+                        </f:facet>
+                    </p:dialog>
+
+                    <p:dialog header="Logs da Simulação" showEffect="fade" modal="true"
+                              minimizable="true" maximizable="true"
+                              widgetVar="logsSimulacaoDialog" responsive="true" fitViewport="true">
+                        <p:outputPanel id="logs-simulacao-content" class="ui-fluid">
+
+                            <p:outputPanel rendered="#{not empty simulacaoController.simulacaoAtual}">
+                                <div class="p-field">
+                                    <h:outputText style="line-height: 16px !important" value="#{logController.logs}" escape="false" />
+                                </div>
+                            </p:outputPanel>
+                        </p:outputPanel>
+                    </p:dialog> 
+                </h:form>
+            </ui:insert>
+        </div>
+
+        <div id="bottom">
+            <ui:insert name="bottom">
+                <p:card class="color: whitesmoke;">
+                    <center>
+                        Instituto Federal de Educação, Ciência e Tecnologia de São Paulo - Câmpus Presidente Epitácio
+                        <br/>
+                        <br/>
+                        Rua José Ramos Junior, 27-50 - Jardim Tropical - Presidente Epitácio - SP - Brasil - Cep: 19470-000
+                        <br/>
+                        Fone/Fax: (18) 3281-9599/3281-9592. E-mail: pep@ifsp.edu.br
+                    </center>
+                </p:card>
+
+            </ui:insert>
+        </div>
+    </h:body>
+</html>

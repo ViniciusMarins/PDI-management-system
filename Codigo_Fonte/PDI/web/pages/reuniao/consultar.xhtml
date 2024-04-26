@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+        <ui:composition template="/pages/home.xhtml">
+            <ui:define name="content">
+                <f:metadata>
+                    <f:viewAction action="#{reuniaoController.fillReuniaoList()}" />
+                </f:metadata>
+                <div class="card">
+                    <h:form id="form">
+                        <p:growl id="messages" showDetail="true"/>
+
+                        <p:breadCrumb>
+                            <p:menuitem outcome="/pages/home" value="Home"/>
+                            <p:menuitem outcome="/pages/reuniao/consultar" value="Consultar Reuniões"/>
+                        </p:breadCrumb>
+
+                        <p:dataTable id="dt-reunioes" widgetVar="dtReunioes" var="reuniao" value="#{reuniaoController.reunioes}"
+                                     emptyMessage="Nenhuma reunião encontrada" rowKey="#{reuniao.idReuniao}" styleClass="reuniao-table"
+                                     style="margin-top: 10px" paginator="true" rows="10" paginatorPosition="bottom">
+
+                            <f:facet name="header">
+                                <div class="flex align-items-center justify-content-between">
+                                    <span>Reuniões</span>
+                                    <div>
+                                        <p:commandButton id="refresh"  action="#{reuniaoController.fillReuniaoList()}" style="margin-right: 7px"
+                                                         process="@this" update="form:dt-reunioes" icon="pi pi-replay" styleClass="rounded-button" />
+
+                                        <p:commandButton id="toggler" type="button" value="Campos" icon="pi pi-align-justify"/>
+
+                                        <p:columnToggler datasource="dt-reunioes" trigger="toggler">
+                                            <p:ajax />
+                                        </p:columnToggler>
+
+                                        <p:tooltip for="refresh" value="Recarregar Tabela" position="top"/>
+                                        <p:tooltip for="toggler" value="Campos da Tabela" position="top"/>
+                                    </div>
+                                </div>
+                            </f:facet>
+
+                            <p:column headerText="Título" sortBy="#{reuniao.titulo}" filterBy="#{reuniao.titulo}">
+                                <h:outputText value="#{reuniao.titulo}"  />
+                            </p:column>
+
+                            <p:column headerText="Descrição" sortBy="#{reuniao.descricao}" filterBy="#{reuniao.descricao}">
+                                <h:outputText value="#{reuniao.descricao.length() le 100 ? reuniao.descricao : reuniao.descricao.substring(0, 100).concat(' ...')}" />
+                            </p:column>
+
+                            <p:column headerText="Data de Início" sortBy="#{reuniao.dataInicio}" 
+                                      filterBy="#{reuniao.dataInicio}" filterMatchMode="contains">
+                                <h:outputText value="#{reuniao.dataInicio}" >
+                                    <f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-3"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Data de Término" sortBy="#{reuniao.dataTermino}" 
+                                      filterBy="#{reuniao.dataTermino}" filterMatchMode="contains">
+                                <h:outputText value="#{reuniao.dataTermino}" >
+                                    <f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-3"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Última Alteração" sortBy="#{reuniao.ultimaAlteracao}" 
+                                      filterBy="#{reuniao.ultimaAlteracao}" filterMatchMode="contains">
+                                <h:outputText value="#{reuniao.ultimaAlteracao}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" timeZone="GMT-3"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Ações" exportable="false">
+
+                                <p:commandButton id="visualizar" action="/pages/reuniao/visualizar.xhtml" icon="pi pi-eye" style="margin-left: 7px;"
+                                                 styleClass="edit-button rounded-button" process="@this">
+                                    <f:setPropertyActionListener value="#{reuniao}" target="#{reuniaoController.reuniaoEdit}"/>
+                                </p:commandButton>
+                                <p:tooltip for="visualizar" value="Visualizar Reunião" position="left"/>        
+
+                                <p:commandButton id="editar" action="/pages/reuniao/editar.xhtml" icon="pi pi-pencil" style="margin-left: 7px;" 
+                                                 styleClass="edit-button rounded-button" process="@this" >
+                                    <f:setPropertyActionListener value="#{reuniao}" target="#{reuniaoController.reuniaoEdit}" />
+                                </p:commandButton>
+
+                                <p:tooltip for="editar" value="Editar Reunião" position="left"/>
+
+                                <p:commandButton id="ATA" action="/pages/reuniao/ATA_reuniao.xhtml" icon="pi pi-file-pdf"
+                                                 style="margin-left: 7px;" styleClass="edit-button rounded-button" process="@this"
+                                                 onclick="abrirEmNovaJanela(); return false;">
+                                    <f:setPropertyActionListener value="#{reuniao}" target="#{reuniaoController.reuniaoATA}"/>
+                                </p:commandButton>
+
+                                <p:tooltip for="ATA" value="ATA da Reunião" position="left"/>
+
+                                <p:commandButton id="deletar" icon="pi pi-trash" style="margin-left: 7px;"
+                                                 oncomplete="PF('deleteReuniaoDialog').show()" 
+                                                 styleClass="ui-button-danger rounded-button" process="@this">
+                                    <f:setPropertyActionListener value="#{reuniao}" target="#{reuniaoController.reuniao}"/>
+                                </p:commandButton>
+                                <p:tooltip for="deletar" value="Deletar Reunião" position="left"/>                 
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+
+                    <h:form id="dialogs">
+                        <p:growl id="msg" showDetail="true"/>
+
+                        <p:confirmDialog widgetVar="deleteReuniaoDialog" showEffect="fade" width="300"
+                                         message="Deseja remover esta reunião?" header="Confirmação" severity="warn">
+                            <p:commandButton value="Sim" icon="pi pi-check" actionListener="#{reuniaoController.removerReuniao()}"
+                                             process="@this" oncomplete="PF('deleteReuniaoDialog').hide()" update="messages"/>
+                            <p:commandButton value="Não" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                             onclick="PF('deleteReuniaoDialog').hide()"/>
+                        </p:confirmDialog>
+                    </h:form>
+                </div>
+
+            </ui:define>
+        </ui:composition>
+        <script>
+            function abrirEmNovaJanela() {
+                window.open('/pages/reuniao/ATA_reuniao.xhtml', '_blank');
+            }
+        </script>
+    </body>
+</html>

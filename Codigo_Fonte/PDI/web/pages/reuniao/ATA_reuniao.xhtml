@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+    <h:head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+        <title>ATA de reunião</title>
+
+        <h:outputStylesheet name="css/pflex.css"/>
+        <h:outputStylesheet name="css/cssATA.css"/>
+
+    </h:head>
+
+    <h:body>
+        <h:form >
+            <div style="display: flex; align-items: center; flex-direction: column; justify-content: center">
+                <table id="tabela">
+                    <tr>
+                        <td id="img_td" style="width:20%" class="td-table">
+                            <p:graphicImage rendered="#{loginController.tema eq 'arya'}" style="width:200px;" name="img/logo_sapdi.png" />
+                            <p:graphicImage rendered="#{loginController.tema eq 'saga'}" style="width:200px;"  name="img/logo_sapdi_branca.png" />
+                        </td>
+
+                        <td class="td-table">
+                            <h1 style="text-align: center;">ATA DE REUNIÃO</h1>
+                        </td>
+                    </tr>
+                    <tr class="tr-table" >
+                        <td colspan="2" class="td-table">
+                            <h2 style="margin-bottom: 24px;text-align: center"> #{reuniaoController.reuniaoATA.titulo}</h2>
+                            <strong>ÚLTIMA ALTERAÇÃO: </strong> 
+                            <h:outputText value="#{reuniaoController.reuniaoATA.ultimaAlteracao}"> 
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" timeZone="GMT-3"/> 
+                            </h:outputText>
+                        </td>
+                    </tr>
+
+                    <tr class="tr-table">
+                        <td colspan="2" class="td-table">
+                            <strong>DATA DE INÍCIO: </strong> 
+                            <h:outputText value="#{reuniaoController.reuniaoATA.dataInicio}" > 
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" timeZone="GMT-3"/> 
+                            </h:outputText>
+                            <br/>
+
+                            <strong>DATA DE TÉRMINO: </strong> 
+                            <h:outputText value="#{reuniaoController.reuniaoATA.dataTermino}" > 
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" timeZone="GMT-3"/> 
+                            </h:outputText>
+                        </td>
+
+                    </tr>
+
+                    <tr class="tr-table" >
+                        <td colspan="2" class="td-table">
+                            <strong>ATA DA REUNIÃO COM A COMUNIDADE INTERNA SOBRE O PDI 2024-2028, CAMPUS
+                                PRESIDENTE EPITÁCIO, REALIZADA NO DIA #{reuniaoController.gerarTextoData()}, 
+                                PRESENCIALMENTE NO IFSP CAMPUS PRESIDENTE EPITÁCIO,
+                                NO HORÁRIO <h:outputText value="#{reuniaoController.reuniaoATA.dataInicio}" > 
+                                    <f:convertDateTime pattern="HH:mm" timeZone="GMT-3"/> 
+                                </h:outputText> ÀS 
+                                <h:outputText value="#{reuniaoController.reuniaoATA.dataTermino}" > 
+                                    <f:convertDateTime pattern="HH:mm" timeZone="GMT-3"/> 
+                                </h:outputText>.
+                            </strong> 
+                            <br></br>
+                            <br></br>
+                            <p>Realizou-se reunião com a comunidade interna do IFSP - Câmpus
+                                Presidente Epitácio sobre o PDI 2024-2028, com a condução da Comissão Local (CL) do
+                                PDI 2024-2028 e do DRG Alexandre Carniato. Todos os servidores do câmpus foram
+                                convocados de acordo com a CONVOCAÇÃO N.º 1/2023 - DRG/PEP/IFSP.</p>
+
+                        </td>
+                    </tr>
+                    <tr class="tr-table">
+                        <td colspan="2" class="td-table">
+                            <strong>DESCRIÇÃO:</strong>  #{reuniaoController.reuniaoATA.descricao}
+                        </td>
+                    </tr>
+                    <tr class="tr-table" >
+                        <td colspan="2" style="border:0px !important;padding:16px!important;" >
+                            <strong><h3>COMENTÁRIOS:</h3></strong>
+                            <p:dataTable id="dt-comentarios" widgetVar="dtComentarios" var="comentario" value="#{reuniaoController.reuniaoATA.comentarioList}"
+                                         emptyMessage="Nenhuma comentário encontrado" rowKey="#{comentario.idComentario}"
+                                         >
+
+
+                                <p:column headerText="Autor" style="width:25%!important">
+                                    <h:outputText value="#{comentario.prontuarioServidor.nome}"  />
+                                </p:column>
+
+                                <p:column headerText="Comentário">
+                                    <h:outputText value="#{comentario.descricao}"  />
+                                </p:column>
+
+
+                            </p:dataTable>
+                        </td> 
+                    </tr>
+
+                    <tr class="tr-table" >
+                        <td colspan="2" style="border:0px !important;padding:16px!important;">
+                            <strong><h3>PRESENÇAS:</h3></strong>
+                            <p:dataTable id="dt-presencas" widgetVar="dtPresencas" var="frequencia" value="#{reuniaoController.reuniaoATA.frequenciaCollection}"
+                                         emptyMessage="Nenhum servidor encontrado" rowKey="#{frequencia.frequenciaPK.servidorProntuario}"
+                                         >
+
+                                <p:column headerText="Autor" style="width:25%!important">
+                                    <h:outputText value="#{frequencia.servidor.nome}"  />
+                                </p:column>
+
+                                <p:column headerText="Presença" style="width:25%!important">
+                                    <h:outputText value="#{frequencia.frequencia eq true ? 'Presente' : 'Ausente' }" />
+                                </p:column>
+
+                                <p:column headerText="Justificativa (caso ausente)">
+                                    <h:outputText value="#{empty frequencia.descricao ? 'Sem justificativa' : frequencia.descricao}" />
+                                </p:column>
+
+                            </p:dataTable>
+                        </td> 
+                    </tr>
+                </table>
+            </div>
+        </h:form>
+    </h:body>
+</html>

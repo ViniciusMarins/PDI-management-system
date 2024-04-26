@@ -1,0 +1,215 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+    <h:head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+        <title>Cadastro de Reunião</title>
+
+        <h:outputStylesheet name="css/pflex.css"/>
+    </h:head>
+    <script>
+        PrimeFaces.locales['pt_BR'] = {
+            closeText: 'Fechar',
+            prevText: 'Anterior',
+            nextText: 'Próximo',
+            currentText: 'Começo',
+            monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+            monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+            dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+            dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+            dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'],
+            weekHeader: 'Semana',
+            firstDay: 1,
+            isRTL: false,
+            showMonthAfterYear: false,
+            yearSuffix: '',
+            timeOnlyTitle: 'Só Horas',
+            timeText: 'Tempo',
+            hourText: 'Hora',
+            minuteText: 'Minuto',
+            secondText: 'Segundo',
+            currentText: 'Data Atual',
+            ampm: false,
+            month: 'Mês',
+            week: 'Semana',
+            day: 'Dia',
+            allDayText: 'Todo Dia'
+        };
+    </script>
+
+    <h:body>
+        <ui:composition template="/pages/home.xhtml">
+            <ui:define name="content">
+                <h:form id="form">
+                    <p:growl id="messages" showDetail="true"/>
+
+                    <p:breadCrumb>
+                        <p:menuitem outcome="/pages/home" value="Home"/>
+                        <p:menuitem outcome="/pages/reuniao/visualizar" value="Visualizar Reunião"/>
+                    </p:breadCrumb>
+
+                    <f:facet name="title">
+                        <i class="pi pi-fw pi-database"></i> Dados da Reunião
+                    </f:facet>
+
+                    <div id="reuniao-content" class="flex flex-column">
+                        <h2 class="col-12 mb-3 mt-3 title" ><i class="pi pi-comments" style="font-size: 24px;margin-right:8px"></i>Reunião</h2>
+
+                        <div class="flex gap-3">
+                            <div style="max-width:400px; width:100%">
+                                <p:outputLabel for="input_titulo">Título</p:outputLabel>
+                                <p:inputText id="input_titulo" disabled="true" required="true" requiredMessage="Campo Título é obrigatório" value="#{reuniaoController.reuniaoEdit.titulo}"/>
+                            </div>
+
+                            <div style="max-width:400px; width:100%">
+                                <p:outputLabel for="data_inicio">Data de Início</p:outputLabel>
+                                <p:datePicker disabled="true" class="block" id="data_inicio" locale="pt_BR" required="true" requiredMessage="Campo Data de Inicio é obrigatório" showTime="true" timeInput="true" readonlyInput="true" 
+                                              value="#{reuniaoController.reuniaoEdit.dataInicio}" mindate="#{reuniaoController.minDate}"/>
+                            </div>
+
+                            <div style="max-width:400px; width:100%">
+                                <p:outputLabel for="data_termino">Data de Término</p:outputLabel>
+                                <p:datePicker disabled="true" class="block" id="data_termino" locale="pt_BR" required="true" requiredMessage="Campo Data de Término é obrigatório" showTime="true" timeInput="true" readonlyInput="true" 
+                                              value="#{reuniaoController.reuniaoEdit.dataTermino}" mindate="#{reuniaoController.minDate}"/>
+                            </div>
+                        </div>
+
+                        <p:outputLabel class="mt-3" for="input_descricao">Descrição</p:outputLabel>
+                        <p:inputTextarea id="input_descricao" rows="7" cols="40"
+                                         required="true" requiredMessage="Defina uma descrição"
+                                         counterTemplate="{0} caracteres restantes."
+                                         counter="display_descricao" disabled="true"
+                                         maxlength="1500" autoResize="true"
+                                         value="#{reuniaoController.reuniaoEdit.descricao}" />
+                        <h:outputText id="display_descricao" style="float: right" />
+
+                    </div>
+
+                    <p:separator style="margin-bottom: 2em; margin-top: 2em"/>
+
+                    <div id="arquivo-content" class="flex flex-column">
+                        <h2 class="col-12 mb-3 title" ><i class="pi pi-file" style="font-size: 24px;margin-right:8px"></i>Arquivos</h2>
+
+                        <p:dataTable id="dt-arquivos" widgetVar="dtArquivos" var="arquivo" value="#{reuniaoController.reuniaoEdit.arquivoList}"
+                                     emptyMessage="Nenhum arquivo encontrado" styleClass="arquivos-table" rowKey="#{arquivo.idArquivo}"
+                                     style="margin-top: 10px" paginator="true" rows="10" paginatorPosition="bottom" reflow="true">
+
+                            <f:facet name="header">
+                                <div class="flex align-items-centern justify-content-between">
+                                    <span>Arquivos da Reunião</span>
+                                </div>
+                            </f:facet>
+
+                            <p:column headerText="Descricao" sortBy="#{arquivo.descricao}">
+                                <h:outputText value="#{arquivo.descricao}"/>
+                            </p:column>
+
+                            <p:column headerText="Nome" sortBy="#{arquivo.nomeUpload}">
+                                <h:outputText value="#{arquivo.nomeUpload}" />
+                            </p:column>
+
+                            <p:column headerText="Ações" exportable="false">
+                                <p:commandButton actionListener="#{reuniaoController.fileDownload(arquivo.nomeUpload)}" ajax="false" 
+                                                 onclick="PrimeFaces.monitorDownload(start, stop);" id="download"
+                                                 icon="pi pi-arrow-down" styleClass="download-button rounded-button">
+                                    <p:fileDownload value="#{reuniaoController.fileDown}"/>
+                                </p:commandButton>
+
+                                <p:tooltip for="download" value="Download Arquivo" position="left"/>
+                            </p:column>
+                        </p:dataTable>
+
+                    </div>
+
+                    <p:separator style="margin-bottom: 2em; margin-top: 2em"/>
+
+                    <div id="comentario-content" class="flex flex-column">
+                        <h2 class="col-12 mb-3 title" > <i class="pi pi-comment" style="font-size: 24px;margin-right:8px"></i>Comentários</h2>
+
+                        <p:dataTable id="dt-comentarios-edit" widgetVar="dtComentarios" var="comentario" value="#{reuniaoController.comentariosEdit}"
+                                     emptyMessage="Nenhum comentário encontrado" styleClass="comentarios-table" rowKey="#{comentario.idComentario}"
+                                     style="margin-top: 10px" paginator="true" rows="10" paginatorPosition="bottom" reflow="true">
+
+                            <f:facet name="header">
+                                <div class="flex align-items-centern justify-content-between">
+                                    <span>Comentários da Reunião</span>
+                                </div>
+                            </f:facet>
+
+                            <p:column headerText="Autor" sortBy="#{comentario.prontuarioServidor.nome}" >
+                                <h:outputText value="#{comentario.prontuarioServidor.nome}" />
+                            </p:column>
+
+                            <p:column headerText="Comentário" sortBy="#{comentario.descricao}">
+                                <h:outputText value="#{comentario.descricao}" />
+                            </p:column>
+
+                            <p:column headerText="Data" sortBy="#{comentario.data}">
+                                <h:outputText value="#{comentario.data}" >
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" timeZone="GMT-3"/>
+                                </h:outputText>
+                            </p:column>
+                        </p:dataTable>
+
+                    </div>
+
+                    <p:separator style="margin-bottom: 2em; margin-top: 2em"/>
+                    <div id="frequencias-content" class="flex flex-column">
+                        <h2 class="col-12 mb-3 title" > <i class="pi pi-users" style="font-size: 24px;margin-right:8px"></i>Lista de Frequências</h2>
+
+
+                        <p:dataTable id="dt-servidores-reuniao" widgetVar="dtServidoresReuniao" value="#{reuniaoController.reuniaoEdit.frequenciaCollection}"
+                                     var="frequencia" emptyMessage="Nenhum servidor encontrado" styleClass="alunos-table" 
+                                     style="margin-top: 10px" paginator="false" 
+                                     rowKey="#{frequencia.frequenciaPK.servidorProntuario}"
+                                     rowIndexVar="index">
+                            <f:facet name="header">
+                                <div class="p-d-flex p-ai-center p-jc-between">
+                                    <span>Frequências da Reunião</span>
+                                </div>
+                            </f:facet>
+
+                            <p:column headerText="Prontuário" sortBy="#{frequencia.servidor.prontuario}" filterBy="#{frequencia.servidor.prontuario}">
+                                <h:outputText value="#{frequencia.servidor.prontuario}" />
+                            </p:column>
+
+                            <p:column headerText="Nome" sortBy="#{frequencia.servidor.nome}" filterBy="#{frequencia.servidor.nome}">
+                                <h:outputText value="#{frequencia.servidor.nome}" />
+                            </p:column>
+
+                            <p:column headerText="Descricao da falta">
+                                <h:outputText value="#{frequencia.descricao}" rendered="#{frequencia.frequencia eq false}"/>
+                            </p:column>
+                            <p:column headerText="Presença">
+                                <p:selectBooleanCheckbox id="presenca" value="#{frequencia.frequencia}" disabled="true"/>
+                            </p:column>
+
+                        </p:dataTable>
+                    </div>
+
+                    <p:commandButton id="voltarBtn" class="mt-5" style="max-width: 220px;width:100%" icon="pi pi-arrow-left" value="Voltar" 
+                                     update="messages" action="/pages/reuniao/consultar.xhtml"/> 
+
+                </h:form>
+
+            </ui:define>
+        </ui:composition>
+
+        <script>
+            //<![CDATA[
+            function start() {
+                PF('statusDialog').show();
+            }
+
+            function stop() {
+                PF('statusDialog').hide();
+            }
+            //]]>
+        </script>
+    </h:body>
+</html>

@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:body>
+        <!-- Editar Dados Servidor -->
+
+        <p:dialog header="Editar Cadastro" showEffect="fade" modal="true"
+                  widgetVar="editServidorCadastroDialog" responsive="true" fitViewport="true">
+            <p:outputPanel id="edit-servidor-content" class="ui-fluid">
+                <p:outputPanel rendered="#{not empty loginController.servidorAutenticado}">
+
+                    <div class="p-field">
+                        <p:outputLabel for="prontuario_servidor_edit">Prontuário</p:outputLabel>
+                        <p:inputMask id="prontuario_servidor_edit" value="#{loginController.servidorAutenticado.prontuario}" mask="AA-9999999" disabled="true"/>
+                    </div>
+
+                    <div class="p-field">
+                        <p:outputLabel for="nome_servidor_edit">Nome</p:outputLabel>
+                        <p:inputText id="nome_servidor_edit" value="#{loginController.servidorAutenticado.nome}" required="true" disabled="false"/>
+                    </div>
+
+                    <div class="p-field">
+                        <p:outputLabel for="email_servidor_edit">Email</p:outputLabel>
+                        <p:inputText id="email_servidor_edit" value="#{loginController.servidorAutenticado.email}" required="true"/>
+                    </div>
+
+                    <div class="p-field">
+                        <p:outputLabel for="tipo_servidor_edit">Tipo</p:outputLabel>
+                        <p:selectOneMenu id="tipo_servidor_edit" value="#{loginController.servidorAutenticado.tipo}" required="true" disabled="true">
+                            <f:selectItem itemLabel="Selecione um Tipo" itemValue=""/>
+                            <f:selectItem itemLabel="PROFESSOR" itemValue="PROFESSOR"/>
+                            <f:selectItem itemLabel="TAE" itemValue="TAE"/>
+                        </p:selectOneMenu>
+                    </div>
+                </p:outputPanel>
+            </p:outputPanel>
+
+            <f:facet name="footer">
+                <p:commandButton value="Editar" icon="pi pi-check" actionListener="#{servidorController.editarServidor(loginController.servidorAutenticado)}"
+                                 update="edit-servidor-content, messages" process="edit-servidor-content @this"/>
+                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('editServidorCadastroDialog').hide()"
+                                 class="ui-button-secondary"/>
+            </f:facet>
+        </p:dialog>
+
+        <p:dialog header="Editar Senha" showEffect="fade" modal="true"
+                  widgetVar="editSenhaServidorDialog" responsive="true" fitViewport="true">
+            <p:outputPanel id="edit-servidor-senha-content" class="ui-fluid">
+                <p:outputPanel rendered="#{not empty loginController.servidorAutenticado}">
+
+                    <div class="p-field">
+                        <p:outputLabel for="senha_servidor_edit_nova" value="Nova Senha" />
+                        <p:password id="senha_servidor_edit_nova" match="senha_servidor_edit_confirm"
+                                    value="#{loginController.senha}" required="false"
+                                    redisplay="true" maxlength="25">
+                            <f:validateLength minimum="5" ></f:validateLength>
+                        </p:password>
+                    </div>
+
+                    <div class="p-field">
+                        <p:outputLabel for="senha_servidor_edit_confirm" value="Confirmar Nova Senha" />
+                        <p:password id="senha_servidor_edit_confirm" required="false"
+                                    value="#{loginController.novaSenha}"
+                                    redisplay="true" maxlength="25">
+                            <f:validateLength minimum="5" ></f:validateLength>
+                        </p:password>
+                    </div>
+                </p:outputPanel>
+            </p:outputPanel>
+
+            <f:facet name="footer">
+                <p:commandButton value="Editar" icon="pi pi-check" actionListener="#{loginController.alterarSenha()}"
+                                 update="edit-servidor-senha-content, messages" process="edit-servidor-senha-content @this"/>
+                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('editSenhaServidorDialog').hide()"
+                                 class="ui-button-secondary"/>
+            </f:facet>
+        </p:dialog>
+
+        <p:dialog header="Definir Sinalizadores" showEffect="fade" modal="true"
+                  minimizable="true" maximizable="true"
+                  widgetVar="editSinalizadoresDialog" responsive="true" fitViewport="true">
+            <p:outputPanel id="edit-sinalizadores-content" class="ui-fluid">
+                <p:outputPanel>
+
+                    <div class="p-field">
+                        <p:outputLabel for="sinalizador_sobreCargaAlta" value="Sinalizador Sobrecarga Alta" />
+                        <p:inputNumber id="sinalizador_sobreCargaAlta"
+                                       value="#{simulacaoController.sinalizadorSobreCargaAlta}" required="false"
+                                       />
+
+                    </div>
+
+                    <div class="p-field">
+                        <p:outputLabel for="sinalizador_sobreCargaMedia" value="Sinalizador Sobrecarga Média" />
+                        <p:inputNumber id="sinalizador_sobreCargaMedia" required="false"
+                                       value="#{simulacaoController.sinalizadorSobreCargaMedia}"
+                                       />
+                    </div>
+                </p:outputPanel>
+            </p:outputPanel>
+
+            <f:facet name="footer">
+                <p:commandButton value="Salvar" icon="pi pi-check" actionListener="#{simulacaoController.updateSinalizadores()}"
+                                 update="edit-sinalizadores-content, messages" process="edit-sinalizadores-content @this"/>
+
+                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('editSinalizadoresDialog').hide()"
+                                 class="ui-button-secondary"/>
+            </f:facet>
+        </p:dialog>
+    </h:body>
+</html>

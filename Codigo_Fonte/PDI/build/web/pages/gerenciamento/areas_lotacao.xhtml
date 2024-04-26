@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+        <ui:composition template="/pages/home.xhtml">
+            <ui:define name="content">
+                <f:metadata>
+                    <f:viewAction action="#{lotacaoController.fillLotacaoList()}" />
+                </f:metadata>
+                <div class="card">
+                    <h:form id="form">
+                        <p:growl id="messages" showDetail="true"/>
+
+                        <p:breadCrumb>
+                            <p:menuitem outcome="/pages/home" value="Home"/>
+                            <p:menuitem outcome="/pages/gerenciamento/areas_lotacao" value="Gerenciamento de Áreas de Lotação"/>
+                        </p:breadCrumb>
+
+                        <p:dataTable id="dt-lotacoes" widgetVar="dtLotacoes" var="lotacao" value="#{lotacaoController.lotacoes}"
+                                     emptyMessage="Nenhuma área de lotação encontrada" rowKey="#{lotacao.idLotacao}" styleClass="lotacao-table"
+                                     style="margin-top: 10px">
+
+                            <f:facet name="header">
+                                <div class="flex align-items-center justify-content-between">
+                                    <span>Áreas</span>
+                                    <div>
+                                        <p:commandButton id="refresh"  action="#{lotacaoController.fillLotacaoList()}" style="margin-right: 7px"
+                                                         process="@this" update="form:dt-lotacoes" icon="pi pi-replay" styleClass="rounded-button" />
+                                        <p:commandButton value="Cadastrar" icon="pi pi-plus" actionListener="#{lotacaoController.openNew()}"
+                                                         update=":dialogs:create-lotacao-content" oncomplete="PF('createLotacaoDialog').show()"
+                                                         style="margin-right: .5rem">
+                                            <p:resetInput target=":dialogs:create-lotacao-content"/>
+                                        </p:commandButton>
+
+                                        <p:commandButton id="toggler" type="button" value="Campos" icon="pi pi-align-justify"/>
+                                        <p:columnToggler datasource="dt-lotacoes" trigger="toggler">
+                                            <p:ajax />
+                                        </p:columnToggler>
+
+                                        <p:tooltip for="refresh" value="Recarregar Tabela" position="top"/>
+                                        <p:tooltip for="toggler" value="Campos da Tabela" position="top"/>
+                                    </div>
+                                </div>
+                            </f:facet>
+
+                            <p:column headerText="Descrição" sortBy="#{lotacao.descricao}" filterBy="#{lotacao.descricao}">
+                                <h:outputText value="#{lotacao.descricao}"  />
+                            </p:column>
+
+                            <p:column headerText="Ações" exportable="false">
+                                <p:commandButton id="editar" icon="pi pi-pencil" update=":dialogs:edit-lotacao-content"
+                                                 oncomplete="PF('editLotacaoDialog').show()"
+                                                 styleClass="edit-button rounded-button" process="@this">
+                                    <f:setPropertyActionListener value="#{lotacao}" target="#{lotacaoController.lotacao}"/>
+                                    <p:resetInput target=":dialogs:edit-lotacao-content"/>
+                                </p:commandButton>
+                                <p:tooltip for="editar" value="Editar Área de Lotação" position="left"/>
+
+                                <p:commandButton id="deletar" icon="pi pi-trash" style="margin-left: 7px;"
+                                                 oncomplete="PF('deleteLotacaoDialog').show()" 
+                                                 styleClass="ui-button-danger rounded-button" process="@this"
+                                                 update="dialogs">
+                                    <f:setPropertyActionListener value="#{lotacao}" target="#{lotacaoController.lotacao}"/>
+                                </p:commandButton>
+                                <p:tooltip for="deletar" value="Deletar Área de Lotação" position="left"/>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+
+                    <h:form id="dialogs">
+                        <p:growl id="msg" showDetail="true"/>
+                        <p:dialog header="Cadastrar Área de Lotação" showEffect="fade" modal="true"
+                                  minimizable="true" maximizable="true" closeOnEscape="true"
+                                  widgetVar="createLotacaoDialog" responsive="true" fitViewport="true">
+                            <p:outputPanel id="create-lotacao-content" class="ui-fluid">
+                                <p:outputPanel rendered="#{not empty lotacaoController.lotacao}">
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="descricao_create">Descrição</p:outputLabel>
+                                        <p:inputText id="descricao_create" value="#{lotacaoController.lotacao.descricao}" required="true" requiredMessage="Descrição da área de lotação é obrigatória."/>
+                                    </div>
+
+                                </p:outputPanel>
+                            </p:outputPanel>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Cadastrar" icon="pi pi-check" actionListener="#{lotacaoController.cadastrarLotacao()}"
+                                                 update="create-lotacao-content msg" process="create-lotacao-content @this"/>
+                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('createLotacaoDialog').hide()"
+                                                 class="ui-button-secondary"/>
+                            </f:facet>
+                        </p:dialog>
+
+                        <p:dialog header="Editar Área de Lotação" showEffect="fade" modal="true"
+                                  minimizable="true" maximizable="true" closeOnEscape="true"
+                                  widgetVar="editLotacaoDialog" responsive="true" fitViewport="true">
+                            <p:outputPanel id="edit-lotacao-content" class="ui-fluid">
+                                <p:outputPanel rendered="#{not empty lotacaoController.lotacao}">
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="descricao_edit">Descrição</p:outputLabel>
+                                        <p:inputText id="descricao_edit" value="#{lotacaoController.lotacao.descricao}" required="true" requiredMessage="Descrição da área de lotação é obrigatória."/>
+                                    </div>
+
+                                </p:outputPanel>
+                            </p:outputPanel>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Editar" icon="pi pi-check" actionListener="#{lotacaoController.editarLotacao()}"
+                                                 update="edit-lotacao-content msg" process="edit-lotacao-content @this"/>
+                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('editLotacaoDialog').hide()"
+                                                 class="ui-button-secondary"/>
+                            </f:facet>
+                        </p:dialog>
+
+                        <p:confirmDialog widgetVar="deleteLotacaoDialog" showEffect="fade" width="300"
+                                         message="Deseja remover a área #{lotacaoController.lotacao.descricao} ? " header="Confirmação" severity="warn">
+                            <p:commandButton value="Sim" icon="pi pi-check" actionListener="#{lotacaoController.removerLotacao()}"
+                                             process="@this" oncomplete="PF('deleteLotacaoDialog').hide()" update="messages"/>
+                            <p:commandButton value="Não" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                             onclick="PF('deleteLotacaoDialog').hide()"/>
+                        </p:confirmDialog>
+                    </h:form>
+                </div>
+
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

@@ -1,0 +1,50 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 29 de out de 2023, 14:58:09
+    Author     : Vinicius
+*/
+
+*{
+    padding:0;
+    margin:0;
+    font-family: "Poppins", sans-serif !important;
+}
+
+#tabela {
+    border-collapse: collapse!important;
+    width:70%!important;
+    margin-top: 32px !important;
+    border: 2px solid !important;
+}
+
+#tabela tr{
+    border: 1px solid;
+    line-height: 32px!important;
+}
+
+.td-table{
+    border: 2px solid!important;
+    padding:16px!important;
+    font-size: 18px!important;
+}
+
+#img_td{
+    padding:24px!important;
+}
+
+.tr-table,.ui-widget{
+   font-size: initial!important;
+}
+
+.ui-datatable table {
+    border-collapse: initial!important;
+}
+
+.ui-datatable thead th{
+    background:none!important;
+}
+
+
