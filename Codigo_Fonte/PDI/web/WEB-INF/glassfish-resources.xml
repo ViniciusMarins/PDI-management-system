@@ -5,8 +5,8 @@
         <property name="serverName" value="localhost"/>
         <property name="portNumber" value="3306"/>
         <property name="databaseName" value="db_pdi"/>
-        <property name="User" value="root"/>
-        <property name="Password" value="root"/>
+        <property name="User" value=""/>
+        <property name="Password" value=""/>
         <property name="allowPublicKeyRetrieval" value="True"/>
         <property name="autoReconnect" value="True"/>
         <property name="useSSL" value="False"/>
